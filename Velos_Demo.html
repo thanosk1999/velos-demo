@@ -1,0 +1,3130 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#1f3a2e" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>Velos — Patient App Demo | Thanos Koumpanis Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f5efe4;
+    --cream-2: #ede4d3;
+    --paper: #fbf7ef;
+    --ink: #1a1a1a;
+    --ink-soft: #444;
+    --muted: #7a7367;
+    --line: #d9d0bf;
+    --olive: #1f3a2e;
+    --olive-2: #2c5141;
+    --olive-soft: #d8e0d8;
+    --terra: #c9633b;
+    --terra-soft: #f4dcc8;
+    --gold: #b88a3a;
+    --rose: #c97a7a;
+    --sky: #9bb8d4;
+    --shadow: 0 6px 24px rgba(31, 58, 46, 0.08);
+    --radius: 18px;
+    --radius-sm: 12px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; background: var(--cream); color: var(--ink); font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; min-height: 100dvh; padding-bottom: 88px; }
+  h1, h2, h3, h4 { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; letter-spacing: -0.01em; margin: 0; color: var(--olive); }
+  h1 { font-size: 2.4rem; line-height: 1.05; }
+  h2 { font-size: 1.7rem; line-height: 1.1; }
+  h3 { font-size: 1.25rem; line-height: 1.2; }
+  p { margin: 0; line-height: 1.55; color: var(--ink-soft); }
+  a { color: var(--olive); text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  input, textarea, select { font-family: inherit; font-size: 1rem; }
+
+  .app {
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--paper);
+    min-height: 100vh;
+    min-height: 100dvh;
+    position: relative;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  @media (min-width: 900px) {
+    body { background: linear-gradient(160deg, #ede4d3 0%, #f5efe4 60%, #d8e0d8 100%); padding: 24px 0 96px; }
+    .app { margin-top: 24px; border-radius: 32px; min-height: calc(100vh - 48px); overflow: hidden; }
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px;
+    background: rgba(251, 247, 239, 0.92);
+    backdrop-filter: saturate(180%) blur(14px);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    border-bottom: 1px solid transparent;
+    transition: border-color .2s;
+  }
+  .topbar.scrolled { border-bottom-color: var(--line); }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 600; color: var(--olive); }
+  .brand-mark { display: flex; align-items: center; }
+  .top-actions { display: flex; align-items: center; gap: 6px; }
+  .lang-toggle {
+    display: flex; gap: 0; background: var(--cream-2);
+    padding: 3px; border-radius: 100px;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+  }
+  .lang-toggle button {
+    padding: 5px 10px; border-radius: 100px; color: var(--muted);
+    transition: background .15s, color .15s;
+  }
+  .lang-toggle button.active { background: var(--paper); color: var(--olive); box-shadow: 0 1px 3px rgba(31,58,46,0.12); }
+
+  .icon-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--olive); background: transparent; }
+  .icon-btn:hover { background: var(--olive-soft); }
+  .back { display: flex; align-items: center; gap: 6px; font-weight: 500; color: var(--olive); padding: 6px 0; }
+  .back svg { width: 20px; height: 20px; }
+
+  .view { display: none; padding: 0 20px 32px; }
+  .view.active { display: block; animation: fade .25s ease; }
+  #view-login { display: none; padding: 0 20px 32px; }
+  #view-login.active { display: block; animation: fade .25s ease; }
+  #view-login .page-head { padding: 4px 0 20px; }
+  #view-login .form-actions { flex-direction: column; margin-top: 20px; gap: 0; }
+  #view-login .form-actions .btn { width: 100%; justify-content: center; }
+  #view-login .field input { background: white; border: 1.5px solid #c8bfb0; border-radius: 10px; padding: 11px 13px; width: 100%; }
+  @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .hero {
+    margin: 12px -20px 0;
+    padding: 32px 24px 36px;
+    background:
+      radial-gradient(ellipse at top right, rgba(201, 99, 59, 0.16), transparent 60%),
+      linear-gradient(180deg, var(--olive-soft) 0%, var(--paper) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-eyebrow { display: inline-flex; align-items: center; gap: 6px; font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--olive-2); background: rgba(255,255,255,0.55); padding: 6px 12px; border-radius: 100px; }
+  .hero h1 { margin-top: 16px; font-size: 2.3rem; font-weight: 600; }
+  .hero h1 em { font-style: italic; color: var(--terra); font-weight: 500; }
+  .hero p.lead { margin-top: 14px; color: var(--ink-soft); font-size: 1.02rem; }
+  .hero-cta { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+  .hero-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 24px; padding-top: 22px; border-top: 1px solid rgba(31, 58, 46, 0.12); }
+  .hero-stat strong { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--olive); display: block; line-height: 1; }
+  .hero-stat span { font-size: 0.72rem; color: var(--muted); display: block; margin-top: 4px; line-height: 1.3; }
+
+  .section-title { display: flex; align-items: baseline; justify-content: space-between; margin: 32px 0 14px; }
+  .section-title h2 { font-size: 1.5rem; }
+  .section-title a { font-size: 0.85rem; font-weight: 500; color: var(--muted); }
+
+  .cond-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .cond-card {
+    text-align: left;
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 16px 16px;
+    transition: transform .15s, box-shadow .15s, border-color .15s;
+    display: flex; flex-direction: column; gap: 8px;
+    min-height: 132px;
+    position: relative; overflow: hidden;
+  }
+  .cond-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--olive); }
+  .cond-card:active { transform: scale(0.98); }
+  .cond-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .cond-card h3 { font-size: 1.08rem; line-height: 1.15; }
+  .cond-card .price { font-size: 0.78rem; color: var(--muted); margin-top: auto; }
+  .cond-card .price b { color: var(--olive); font-weight: 600; }
+
+  .cond-hair  .cond-icon { background: #f4e2c8; color: #8a5a2b; }
+  .cond-ed    .cond-icon { background: var(--terra-soft); color: var(--terra); }
+  .cond-skin  .cond-icon { background: #f6dada; color: #a64a4a; }
+  .cond-mind  .cond-icon { background: #d8e6e0; color: var(--olive); }
+  .cond-weight .cond-icon { background: #e9dff3; color: #6f4d99; }
+  .cond-women .cond-icon { background: #fadfe4; color: #b34b66; }
+
+  .steps { display: flex; flex-direction: column; gap: 14px; }
+  .step {
+    background: var(--cream);
+    border-radius: var(--radius);
+    padding: 16px;
+    display: flex; gap: 14px; align-items: flex-start;
+    border: 1px solid var(--line);
+  }
+  .step-num { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; background: var(--olive); color: var(--cream); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 1rem; }
+  .step h4 { font-family: 'Inter', sans-serif; font-size: 0.98rem; color: var(--olive); margin: 0 0 4px; font-weight: 600; letter-spacing: -0.005em; }
+  .step p { font-size: 0.86rem; }
+
+  .trust {
+    margin: 28px -20px 0;
+    padding: 24px 24px;
+    background: var(--olive);
+    color: var(--cream);
+  }
+  .trust h2 { color: var(--cream); font-size: 1.5rem; }
+  .trust p { color: rgba(245, 239, 228, 0.86); font-size: 0.92rem; margin-top: 8px; }
+  .trust-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .pill { font-size: 0.74rem; padding: 6px 12px; border-radius: 100px; background: rgba(245, 239, 228, 0.14); color: var(--cream); border: 1px solid rgba(245, 239, 228, 0.22); }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 20px; border-radius: 100px;
+    font-weight: 600; font-size: 0.98rem;
+    transition: transform .1s, background .15s, color .15s;
+    width: 100%;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--olive); color: var(--cream); }
+  .btn-primary:hover { background: var(--olive-2); }
+  .btn-secondary { background: transparent; color: var(--olive); border: 1.5px solid var(--olive); }
+  .btn-secondary:hover { background: var(--olive-soft); }
+  .btn-terra { background: var(--terra); color: white; }
+  .btn-terra:hover { background: #b3552f; }
+  .btn-ghost { background: transparent; color: var(--olive); padding: 12px 16px; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .page-head { padding: 8px 0 24px; }
+  .page-head h1 { font-size: 2rem; margin-top: 8px; }
+  .page-head p.sub { margin-top: 10px; }
+
+  .cond-hero {
+    margin: 4px -20px 24px;
+    padding: 28px 24px 24px;
+  }
+  .cond-hero.h-hair { background: linear-gradient(180deg, #f4e2c8 0%, var(--paper) 100%); }
+  .cond-hero.h-ed { background: linear-gradient(180deg, var(--terra-soft) 0%, var(--paper) 100%); }
+  .cond-hero.h-skin { background: linear-gradient(180deg, #f6dada 0%, var(--paper) 100%); }
+  .cond-hero.h-mind { background: linear-gradient(180deg, #d8e6e0 0%, var(--paper) 100%); }
+  .cond-hero.h-weight { background: linear-gradient(180deg, #e9dff3 0%, var(--paper) 100%); }
+  .cond-hero.h-women { background: linear-gradient(180deg, #fadfe4 0%, var(--paper) 100%); }
+  .cond-hero h1 { font-size: 2.1rem; }
+  .price-tag { display: inline-flex; align-items: center; gap: 6px; background: white; border: 1px solid var(--line); padding: 8px 14px; border-radius: 100px; font-size: 0.86rem; font-weight: 500; color: var(--olive); margin-top: 14px; }
+  .price-tag b { font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; font-weight: 700; }
+
+  .info-card { background: var(--cream); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
+  .info-card h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; color: var(--olive); margin-bottom: 8px; }
+  .info-card p { font-size: 0.9rem; }
+
+  .treatments { display: flex; flex-direction: column; gap: 10px; margin: 14px 0; }
+  .tx-row { display: flex; align-items: center; gap: 12px; padding: 14px; background: white; border: 1px solid var(--line); border-radius: var(--radius-sm); }
+  .tx-pill { font-size: 0.68rem; font-weight: 700; padding: 3px 8px; border-radius: 100px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .tx-pill.rx { background: var(--olive-soft); color: var(--olive); }
+  .tx-pill.otc { background: var(--terra-soft); color: var(--terra); }
+  .tx-row .tx-name { flex: 1; font-weight: 500; color: var(--ink); }
+  .tx-row .tx-meta { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  .progress { display: flex; gap: 6px; margin: 4px 0 24px; }
+  .progress-bar { flex: 1; height: 4px; border-radius: 100px; background: var(--line); overflow: hidden; }
+  .progress-bar.done { background: var(--olive); }
+  .progress-bar.active { background: var(--olive); }
+  .q-count { font-size: 0.78rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; }
+  .q-title { font-family: 'Cormorant Garamond', serif; font-size: 1.7rem; line-height: 1.15; color: var(--olive); margin: 8px 0 8px; }
+  .q-help { font-size: 0.9rem; margin-bottom: 22px; }
+
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .opt {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 18px;
+    background: var(--cream);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: border-color .12s, background .12s;
+    width: 100%;
+    text-align: left;
+    font-size: 0.98rem;
+    color: var(--ink);
+  }
+  .opt:hover { border-color: var(--olive); }
+  .opt.selected { border-color: var(--olive); background: white; box-shadow: 0 0 0 4px var(--olive-soft); }
+  .opt-marker { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); display: flex; align-items: center; justify-content: center; transition: border-color .12s; }
+  .opt.selected .opt-marker { border-color: var(--olive); background: var(--olive); }
+  .opt.selected .opt-marker::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--cream); }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .field label { font-size: 0.85rem; font-weight: 500; color: var(--olive); }
+  .field input, .field textarea, .field select {
+    padding: 14px 16px; border: 1.5px solid var(--line); border-radius: var(--radius-sm);
+    background: var(--cream); color: var(--ink); outline: none;
+    transition: border-color .12s, background .12s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--olive); background: white; }
+  .field .hint { font-size: 0.78rem; color: var(--muted); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .form-actions { display: flex; gap: 10px; margin-top: 28px; }
+
+  .upload {
+    border: 1.5px dashed var(--line);
+    border-radius: var(--radius-sm);
+    padding: 22px 16px;
+    text-align: center;
+    background: var(--cream);
+    color: var(--muted);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .upload.drag-over {
+    border-color: var(--olive);
+    background: #f0ede6;
+  }
+  .upload svg { width: 28px; height: 28px; margin-bottom: 6px; color: var(--olive); }
+
+  .field-error input, .field-error select, .field-error textarea {
+    border-color: #c0392b !important;
+    background: #fff8f8 !important;
+  }
+  .field-error-msg { color: #c0392b; font-size: 0.8rem; margin-top: 4px; display: block; }
+  .consent-row { display: flex; gap: 12px; padding: 14px; background: var(--cream); border: 1px solid var(--line); border-radius: var(--radius-sm); margin-bottom: 10px; align-items: flex-start; cursor: pointer; }
+  .consent-row.checked { border-color: var(--olive); background: white; }
+  .consent-row input { margin: 4px 0 0; accent-color: var(--olive); width: 18px; height: 18px; }
+  .consent-row .ct { font-size: 0.85rem; color: var(--ink-soft); line-height: 1.45; }
+  .consent-row .ct b { display: block; color: var(--olive); margin-bottom: 2px; font-weight: 600; font-family: 'Inter', sans-serif; font-size: 0.9rem; }
+
+  .summary-row { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 0.92rem; }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row span:first-child { color: var(--muted); }
+  .summary-row span:last-child { color: var(--ink); font-weight: 500; text-align: right; }
+
+  .pay-total {
+    background: var(--olive); color: var(--cream);
+    border-radius: var(--radius); padding: 22px;
+    display: flex; flex-direction: column; gap: 6px;
+    margin-bottom: 16px;
+  }
+  .pay-total .label { font-size: 0.82rem; opacity: 0.8; }
+  .pay-total .amount { font-family: 'Cormorant Garamond', serif; font-size: 2.4rem; font-weight: 600; }
+  .pay-total .detail { font-size: 0.82rem; opacity: 0.85; }
+
+  .pay-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+  .pay-opt { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1.5px solid var(--line); border-radius: var(--radius-sm); background: var(--cream); cursor: pointer; }
+  .pay-opt.selected { border-color: var(--olive); background: white; box-shadow: 0 0 0 4px var(--olive-soft); }
+  .pay-opt .pay-logo { width: 42px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; }
+  .pay-opt .pay-name { flex: 1; font-weight: 500; font-size: 0.94rem; }
+  .pay-opt .pay-sub { font-size: 0.74rem; color: var(--muted); }
+
+  .status-hero {
+    margin: 0 -20px 24px;
+    padding: 36px 24px 32px;
+    background: linear-gradient(160deg, var(--olive-soft) 0%, var(--paper) 100%);
+    text-align: center;
+  }
+  .check-ring { width: 80px; height: 80px; border-radius: 50%; background: var(--olive); color: var(--cream); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+  .check-ring svg { width: 40px; height: 40px; }
+
+  .timeline { padding-left: 28px; position: relative; }
+  .timeline::before { content: ''; position: absolute; left: 9px; top: 8px; bottom: 8px; width: 2px; background: var(--line); }
+  .tl-item { position: relative; padding-bottom: 22px; }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-dot { position: absolute; left: -28px; top: 4px; width: 20px; height: 20px; border-radius: 50%; background: var(--cream); border: 2px solid var(--line); }
+  .tl-item.done .tl-dot { background: var(--olive); border-color: var(--olive); }
+  .tl-item.active .tl-dot { background: var(--terra); border-color: var(--terra); box-shadow: 0 0 0 4px var(--terra-soft); }
+  .tl-item h4 { font-family: 'Inter', sans-serif; font-size: 0.94rem; color: var(--olive); margin-bottom: 4px; font-weight: 600; }
+  .tl-item p { font-size: 0.84rem; }
+  .tl-item.pending h4 { color: var(--muted); }
+  .tl-item.pending p { color: var(--muted); }
+
+  .case-card {
+    background: var(--cream); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 16px; margin-bottom: 12px; display: block; width: 100%; text-align: left;
+    cursor: pointer; transition: border-color .12s, transform .12s;
+  }
+  .case-card:hover { border-color: var(--olive); }
+  .case-card:active { transform: scale(0.99); }
+  .case-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .case-head h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; color: var(--olive); }
+  .badge { font-size: 0.7rem; padding: 4px 10px; border-radius: 100px; font-weight: 600; letter-spacing: 0.02em; }
+  .badge.new { background: var(--olive-soft); color: var(--olive); }
+  .badge.review { background: #faead4; color: #8a5a2b; }
+  .badge.rx { background: var(--terra-soft); color: var(--terra); }
+  .badge.done { background: #e2e8de; color: var(--muted); }
+  .badge.info { background: #fae2e2; color: #a64a4a; }
+  .case-meta { font-size: 0.82rem; color: var(--muted); }
+
+  .profile-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 0; border-bottom: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .profile-row:last-child { border-bottom: none; }
+  .profile-row .lbl { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+  .profile-row .val { font-size: 0.96rem; color: var(--ink); font-weight: 500; }
+  .profile-row svg { color: var(--muted); width: 18px; height: 18px; flex-shrink: 0; }
+
+  .avatar { width: 64px; height: 64px; border-radius: 50%; background: var(--olive); color: var(--cream); display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 600; }
+
+  .navbar {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    background: rgba(251, 247, 239, 0.96);
+    backdrop-filter: saturate(180%) blur(14px);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    border-top: 1px solid var(--line);
+    display: flex; justify-content: space-around;
+    padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+    z-index: 100;
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 6px 12px; border-radius: 12px;
+    color: var(--muted); font-size: 0.68rem; font-weight: 600;
+    flex: 1; max-width: 88px;
+    transition: color .12s;
+  }
+  .nav-item svg { width: 22px; height: 22px; }
+  .nav-item.active { color: var(--olive); }
+  .nav-item.active .nav-icon { transform: scale(1.05); }
+  .nav-icon { transition: transform .15s; }
+
+  .mode-toggle {
+    display: flex; gap: 4px; background: var(--cream-2); padding: 4px; border-radius: 100px;
+    margin: 16px 0 8px;
+  }
+  .mode-btn { flex: 1; padding: 8px 14px; border-radius: 100px; font-size: 0.82rem; font-weight: 600; color: var(--muted); }
+  .mode-btn.active { background: var(--paper); color: var(--olive); box-shadow: var(--shadow); }
+
+  .doc-case {
+    background: var(--cream); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px; margin-bottom: 12px;
+  }
+  .doc-case h3 { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; color: var(--olive); margin-bottom: 4px; }
+  .doc-case .pt-meta { font-size: 0.82rem; color: var(--muted); margin-bottom: 12px; }
+  .doc-case .intake { font-size: 0.88rem; padding: 12px; background: var(--paper); border-radius: var(--radius-sm); border-left: 3px solid var(--olive); margin-bottom: 12px; }
+  .doc-case .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .doc-case .actions button {
+    flex: 1; padding: 10px 12px; border-radius: 100px; font-size: 0.82rem; font-weight: 600;
+    min-width: 0;
+  }
+  .doc-case .actions .act-rx { background: var(--olive); color: var(--cream); }
+  .doc-case .actions .act-info { background: var(--terra-soft); color: var(--terra); }
+  .doc-case .actions .act-decline { background: var(--cream-2); color: var(--ink-soft); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .spacer-lg { height: 28px; }
+  .spacer-md { height: 16px; }
+  .center { text-align: center; }
+  .small { font-size: 0.8rem; color: var(--muted); }
+  .divider { height: 1px; background: var(--line); margin: 20px 0; border: 0; }
+  .pharmacy-banner {
+    background: linear-gradient(135deg, var(--olive) 0%, var(--olive-2) 100%);
+    color: var(--cream); border-radius: var(--radius);
+    padding: 20px; margin: 16px 0;
+    display: flex; gap: 14px; align-items: center;
+  }
+  .pharmacy-banner h4 { color: var(--cream); font-family: 'Inter', sans-serif; font-size: 0.96rem; margin-bottom: 4px; font-weight: 600; }
+  .pharmacy-banner p { color: rgba(245, 239, 228, 0.86); font-size: 0.82rem; }
+  .pharmacy-banner .pb-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(245, 239, 228, 0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  .modal-bg { position: fixed; inset: 0; background: rgba(26, 26, 26, 0.5); display: none; align-items: flex-end; justify-content: center; z-index: 200; }
+  .modal-bg.show { display: flex; animation: fade .2s; }
+  .modal {
+    background: var(--paper);
+    width: 100%; max-width: 480px;
+    border-radius: 24px 24px 0 0;
+    padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+    max-height: 85vh; overflow: auto;
+    animation: slideUp .25s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .modal-grip { width: 44px; height: 4px; background: var(--line); border-radius: 100px; margin: 0 auto 18px; }
+
+  .plan-card {
+    background: linear-gradient(160deg, #f4e2c8 0%, var(--paper) 100%);
+    border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px; margin: 12px 0;
+    position: relative; overflow: hidden;
+  }
+  .plan-card .save-badge { position: absolute; top: 14px; right: 14px; background: var(--terra); color: white; font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 100px; letter-spacing: 0.04em; }
+  .plan-card h3 { font-size: 1.4rem; font-family: 'Cormorant Garamond', serif; }
+  .plan-price { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; color: var(--olive); margin: 6px 0; }
+  .plan-price small { font-size: 0.9rem; color: var(--muted); font-family: 'Inter', sans-serif; }
+  .plan-feat { display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: var(--ink-soft); margin: 8px 0; }
+  .plan-feat svg { width: 18px; height: 18px; color: var(--olive); flex-shrink: 0; margin-top: 2px; }
+
+  .empty { text-align: center; padding: 48px 20px; color: var(--muted); }
+  .empty svg { width: 64px; height: 64px; color: var(--line); margin-bottom: 14px; }
+
+  /* ── Error Toast ── */
+  .error-toast {
+    position: fixed; bottom: 104px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #3d1a1a; color: #fdf0f0; padding: 12px 20px; border-radius: 12px;
+    font-size: 0.88rem; max-width: 340px; text-align: center; z-index: 200;
+    opacity: 0; transition: opacity .25s, transform .25s; pointer-events: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,.25);
+  }
+  .error-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── Message bubbles in case detail ── */
+  .messages-list { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+  .msg-row { display: flex; flex-direction: column; max-width: 82%; }
+  .msg-row.sent { align-self: flex-end; align-items: flex-end; }
+  .msg-row.recv { align-self: flex-start; align-items: flex-start; }
+  .msg-bubble {
+    padding: 10px 14px; border-radius: 16px; font-size: 0.9rem; line-height: 1.45;
+  }
+  .msg-row.sent .msg-bubble { background: var(--olive); color: white; border-bottom-right-radius: 4px; }
+  .msg-row.recv .msg-bubble { background: var(--cream-2); color: var(--ink); border-bottom-left-radius: 4px; }
+
+  /* ── Loading state for buttons ── */
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  /* ── Cases loading row ── */
+  .loading-row { padding: 32px; text-align: center; color: var(--muted); font-size: 0.9rem; }
+
+  .vl-modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 99998;
+    background: rgba(0,0,0,0.55); backdrop-filter: blur(2px);
+    align-items: center; justify-content: center; padding: 16px;
+  }
+  .vl-modal-overlay.open { display: flex; }
+  .vl-modal-box {
+    background: #FAFAF7; border-radius: 16px; max-width: 680px; width: 100%;
+    max-height: 85vh; display: flex; flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  }
+  .vl-modal-header {
+    padding: 20px 24px 16px; border-bottom: 1px solid #E5E0D8;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  }
+  .vl-modal-header h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; color: #3D4A2A; margin: 0; }
+  .vl-modal-close {
+    background: none; border: none; cursor: pointer; color: #888;
+    font-size: 1.4rem; line-height: 1; padding: 2px 6px; flex-shrink: 0;
+  }
+  .vl-modal-close:hover { color: #333; }
+  .vl-modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+  .vl-modal-body h3 { font-size: 0.95rem; font-weight: 700; color: #3D4A2A; margin: 20px 0 6px; }
+  .vl-modal-body h3:first-child { margin-top: 0; }
+  .vl-modal-body p { font-size: 0.875rem; color: #444; line-height: 1.6; margin: 0 0 10px; }
+  .vl-modal-body ul { margin: 0 0 10px; padding-left: 20px; }
+  .vl-modal-body ul li { font-size: 0.875rem; color: #444; line-height: 1.6; margin-bottom: 4px; }
+  .vl-modal-body .vl-note { background: #FFF8E7; border-radius: 8px; padding: 10px 14px; font-size: 0.8rem; color: #7A5A00; margin: 16px 0; }
+  .vl-modal-footer { padding: 14px 24px; border-top: 1px solid #E5E0D8; text-align: right; }
+  .vl-modal-footer button { background: #5C6B3A; color: #fff; border: none; border-radius: 8px; padding: 10px 24px; cursor: pointer; font-size: 0.9rem; }
+  .vl-modal-footer button:hover { background: #4A5630; }
+
+
+  /* ===== DEMO OVERLAY & BANNER ===== */
+  #demo-banner {
+    position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    z-index: 9999; background: #1f3a2e; color: #f5efe4;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 16px; font-family: 'Inter', sans-serif; font-size: 11.5px;
+    font-weight: 500; gap: 8px; box-shadow: 0 2px 12px rgba(31,58,46,0.35);
+    border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+  }
+  #demo-banner .db-dot { width: 7px; height: 7px; border-radius: 50%; background: #c9633b;
+    flex-shrink: 0; animation: db-pulse 2s ease-in-out infinite; }
+  @keyframes db-pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+  #demo-banner .db-l { display:flex; align-items:center; gap:7px; }
+  #demo-banner .db-r { display:flex; gap:12px; align-items:center; opacity:.8; }
+  #demo-banner a { color:#d8e0d8; text-decoration:underline; font-size:11px; }
+  body { padding-top: 34px !important; }
+
+  #demo-overlay {
+    position: fixed; inset: 0; z-index: 9998;
+    background: rgba(20, 38, 28, 0.9);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .do-card {
+    background: #fbf7ef; border-radius: 26px; max-width: 390px; width: 100%;
+    padding: 30px 26px; box-shadow: 0 32px 80px rgba(0,0,0,.4);
+    font-family: 'Inter', sans-serif;
+  }
+  .do-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #f4dcc8; color: #8a4a20; border-radius: 100px;
+    font-size: 10.5px; font-weight: 700; letter-spacing:.07em;
+    text-transform: uppercase; padding: 5px 12px; margin-bottom: 18px;
+  }
+  .do-card h2 {
+    font-family: 'Cormorant Garamond', serif; font-size: 2rem;
+    color: #1f3a2e; font-weight: 600; margin: 0 0 10px; line-height: 1.1;
+  }
+  .do-card > p { font-size: 13.5px; color: #5a5248; line-height: 1.6; margin: 0 0 14px; }
+  .do-features {
+    background: #f0ebe1; border-radius: 14px; padding: 14px 16px;
+    margin: 14px 0 18px; display: flex; flex-direction: column; gap: 9px;
+  }
+  .do-feat { display:flex; gap:10px; align-items:flex-start; font-size:13px; color:#3a3530; line-height:1.5; }
+  .do-feat span:first-child { flex-shrink:0; }
+  .do-cta {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; padding: 14px 20px; border-radius: 100px;
+    background: #1f3a2e; color: #f5efe4; font-weight: 600; font-size: 15px;
+    cursor: pointer; border: none; font-family: 'Inter', sans-serif;
+    transition: background .15s; letter-spacing: -.01em;
+  }
+  .do-cta:hover { background: #2c5141; }
+  .do-footer { text-align:center; font-size:11.5px; color:#9a9189; margin-top:14px; line-height:1.6; }
+  .do-footer a { color:#1f3a2e; text-decoration:underline; }
+
+</style>
+</head>
+<body>
+
+<!-- ===== DEMO BANNER ===== -->
+<div id="demo-banner">
+  <div class="db-l">
+    <div class="db-dot"></div>
+    <span>Interactive portfolio demo &mdash; no backend required</span>
+  </div>
+  <div class="db-r">
+    <span>Thanos Koumpanis &middot; 2026</span>
+    <a href="mailto:thkoumpanis@gmail.com">Contact</a>
+  </div>
+</div>
+
+<!-- ===== WELCOME OVERLAY ===== -->
+<div id="demo-overlay">
+  <div class="do-card">
+    <div class="do-tag">&#9654;&nbsp; Portfolio demo</div>
+    <h2>Velos<br>Patient App</h2>
+    <p>First Greek Hims/Hers-style telehealth platform. This is the <strong>live patient UI</strong> — explore every screen, fill in forms, submit a case.</p>
+    <div class="do-features">
+      <div class="do-feat"><span>💊</span><span>Pick a condition → clinical intake → payment → prescription tracking</span></div>
+      <div class="do-feat"><span>🔒</span><span>AES-256 health data encryption + GDPR Article 9 consent logging in the real backend</span></div>
+      <div class="do-feat"><span>🇬🇷</span><span>Bilingual EL / EN — toggle top-right. My Care tab shows two demo cases.</span></div>
+      <div class="do-feat"><span>⚡</span><span>Full-stack: NestJS · PostgreSQL · Docker · Stripe · AWS · Built in ~5 days</span></div>
+    </div>
+    <p style="font-size:12.5px;color:#9a9189;margin:0;">All screens navigable. Payment is simulated — no charge, no login needed.</p>
+    <button class="do-cta" onclick="document.getElementById('demo-overlay').style.display='none'; setTimeout(()=>renderAccount(),50);">Explore the app &rarr;</button>
+    <div class="do-footer">
+      <a href="mailto:thkoumpanis@gmail.com">thkoumpanis@gmail.com</a> &nbsp;&middot;&nbsp;
+      <a href="https://www.linkedin.com/in/thanos-koumpanis-6097a0205/">LinkedIn</a>
+    </div>
+  </div>
+</div>
+
+<div id="velos-splash" style="position:fixed;inset:0;background:#FAFAF7;display:flex;align-items:center;justify-content:center;z-index:99999;">
+  <svg id="splash-svg" width="260" height="100" viewBox="0 0 260 100" style="overflow:visible;">
+    <line id="sp-line" x1="0" y1="68" x2="0" y2="68" stroke="#C25B3A" stroke-width="1.8" stroke-linecap="round"/>
+    <polyline id="sp-arrow" points="0,0 0,0 0,0" fill="none" stroke="#C25B3A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <text id="sp-v" x="0"   y="62" font-family="Arial,sans-serif" font-size="52" font-weight="300" fill="#C25B3A" opacity="0">v</text>
+    <text id="sp-e" x="32"  y="62" font-family="Arial,sans-serif" font-size="52" font-weight="300" fill="#2A2A2A" opacity="0">e</text>
+    <text id="sp-l" x="66"  y="62" font-family="Arial,sans-serif" font-size="52" font-weight="300" fill="#2A2A2A" opacity="0">l</text>
+    <text id="sp-o" x="83"  y="62" font-family="Arial,sans-serif" font-size="52" font-weight="300" fill="#2A2A2A" opacity="0">o</text>
+    <text id="sp-s" x="118" y="62" font-family="Arial,sans-serif" font-size="52" font-weight="300" fill="#2A2A2A" opacity="0">s</text>
+    <text id="sp-tag" x="2" y="88" font-family="Arial,sans-serif" font-size="11" fill="#999" letter-spacing="3.5" opacity="0">TELEHEALTH</text>
+  </svg>
+</div>
+<script>
+(function(){
+  if (sessionStorage.getItem('velos_splash_shown')) {
+    document.getElementById('velos-splash').style.display='none';
+    return;
+  }
+  sessionStorage.setItem('velos_splash_shown','1');
+  const FULL_W = 148;
+  function ease(t){return t<0.5?2*t*t:-1+(4-2*t)*t;}
+  function anim(ms,tick,done){
+    const s=performance.now();
+    function f(n){const r=Math.min((n-s)/ms,1),t=ease(r);tick(t,r);if(r<1)requestAnimationFrame(f);else if(done)done();}
+    requestAnimationFrame(f);
+  }
+  function fadein(el,delay,dur){setTimeout(()=>anim(dur,t=>el.setAttribute('opacity',t)),delay);}
+  const letters=['sp-v','sp-e','sp-l','sp-o','sp-s'];
+  letters.forEach((id,i)=>fadein(document.getElementById(id),i*90,320));
+  setTimeout(()=>{
+    anim(500,t=>{document.getElementById('sp-line').setAttribute('x2',t*FULL_W);},()=>{
+      anim(200,t=>{
+        const ax=FULL_W+t*10;
+        document.getElementById('sp-arrow').setAttribute('points',`${FULL_W-8},62 ${ax},68 ${FULL_W-8},74`);
+      },()=>{
+        fadein(document.getElementById('sp-tag'),100,400);
+        setTimeout(()=>{
+          const s=document.getElementById('velos-splash');
+          let op=1;
+          const fade=setInterval(()=>{op-=0.06;s.style.opacity=op;if(op<=0){clearInterval(fade);s.style.display='none';}},20);
+        },800);
+      });
+    });
+  }, letters.length*90+200);
+})();
+</script>
+
+<div class="app">
+
+  <header class="topbar" id="topbar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="90" height="32" viewBox="0 0 90 32" style="display:block;overflow:visible;">
+          <text x="0" y="24" font-family="Arial,sans-serif" font-size="20" font-weight="300" fill="#C25B3A">v</text>
+          <text x="13" y="24" font-family="Arial,sans-serif" font-size="20" font-weight="300" fill="#3D4A2A">elos</text>
+          <line x1="0" y1="28" x2="52" y2="28" stroke="#C25B3A" stroke-width="1.3" stroke-linecap="round"/>
+          <polyline points="46,23 54,28 46,33" fill="none" stroke="#C25B3A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+    <div class="top-actions">
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button id="lang-el" class="active" onclick="setLanguage('el')">EL</button>
+        <button id="lang-en" onclick="setLanguage('en')">EN</button>
+      </div>
+      <button class="icon-btn" onclick="showView('account')" aria-label="Account">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <section class="view" id="view-login">
+    <button class="back" onclick="goBackFromLogin()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span data-i18n="back">Πίσω</span></button>
+    <div class="page-head">
+      <h1 data-i18n="login_h1">Σύνδεση</h1>
+      <p class="sub" data-i18n="login_sub">Καλώς ήρθες πίσω</p>
+    </div>
+    <div class="field">
+      <label data-i18n="pi_email">Email</label>
+      <input type="email" id="login-email" autocomplete="email" />
+    </div>
+    <div class="field">
+      <label data-i18n="login_password">Κωδικός</label>
+      <input type="password" id="login-password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" />
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" id="login-btn" onclick="doLogin()" data-i18n="login_cta">Σύνδεση</button>
+      <p class="small center" style="margin-top:14px;">
+        <span data-i18n="login_no_account">Δεν έχεις λογαριασμό;</span>
+        <a href="#" onclick="showView('patient-info'); return false;" style="color:var(--olive);font-weight:600;" data-i18n="login_register"> Εγγραφή</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- =================== HOME =================== -->
+  <section class="view active" id="view-home">
+    <div class="hero">
+      <span class="hero-eyebrow">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        <span data-i18n="hero_eyebrow">100% νόμιμο · ηλεκτρονική συνταγή ΗΔΙΚΑ</span>
+      </span>
+      <h1 data-i18n-html="hero_title">Ιατρική φροντίδα που μένει <em>μεταξύ μας.</em> Σε κάθε ελληνικό φαρμακείο.</h1>
+      <p class="lead" data-i18n="hero_lead">Online εξέταση με αδειούχο Έλληνα γιατρό. Η συνταγή σου σε περιμένει σε οποιοδήποτε από τα 11.000 φαρμακεία — αρκεί ο ΑΜΚΑ σου.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary" onclick="showView('conditions')" data-i18n="cta_start">Ξεκίνα εξέταση</button>
+        <button class="btn btn-ghost" onclick="showView('how')" data-i18n="cta_how">Πώς λειτουργεί →</button>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><strong>11.000+</strong><span data-i18n="stat_pharm">Φαρμακεία</span></div>
+        <div class="hero-stat"><strong>24ω</strong><span data-i18n="stat_reply">Απάντηση γιατρού</span></div>
+        <div class="hero-stat"><strong>€25+</strong><span data-i18n="stat_consult">Ανά εξέταση</span></div>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <h2 data-i18n="home_pick">Για ποιο θέμα θέλεις βοήθεια;</h2>
+    </div>
+    <div class="cond-grid" id="cond-grid"></div>
+
+    <div class="section-title"><h2 data-i18n="home_how">Πώς λειτουργεί η Velos</h2></div>
+    <div class="steps" id="home-steps"></div>
+
+    <div class="trust">
+      <h2 data-i18n="trust_title">Γιατί υπάρχουμε</h2>
+      <p data-i18n="trust_body">~4 εκατομμύρια Έλληνες ζουν σε περιοχές με περιορισμένη πρόσβαση σε γιατρό. 6.000+ νησιά δεν έχουν ειδικούς. Κάποιες συζητήσεις — τριχόπτωση, στυτική δυσλειτουργία, ψυχική υγεία, αντισύλληψη — ξεκινούν πιο εύκολα διακριτικά. Η Velos τις κάνει ήσυχα εφικτές.</p>
+      <div class="trust-pills">
+        <span class="pill" data-i18n="pill_law">Σύμφωνα με Ν. 5129/2024</span>
+        <span class="pill" data-i18n="pill_gdpr">GDPR + ΑΠΔΠΧ</span>
+        <span class="pill" data-i18n="pill_eopyy">Συμβατό με ΕΟΠΥΥ</span>
+        <span class="pill" data-i18n="pill_pis">Αδειούχοι ΠΙΣ γιατροί</span>
+      </div>
+    </div>
+
+    <div class="section-title"><h2 data-i18n="home_voices">Τι λένε οι ασθενείς μας</h2></div>
+    <div class="info-card">
+      <p style="font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; color: var(--olive); font-style: italic; line-height: 1.4;" data-i18n="testi1">«Μένω στη Σκύρο. Ο πιο κοντινός δερματολόγος είναι ένα πλοίο μακριά. Πήρα τη συνταγή μου για τρετινοΐνη το Σάββατο πρωί, την παρέλαβα στο φαρμακείο του χωριού τη Δευτέρα.»</p>
+      <p class="small" style="margin-top: 10px;" data-i18n="testi1_who">— Ελένη, 34, Σκύρος</p>
+    </div>
+    <div class="info-card">
+      <p style="font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; color: var(--olive); font-style: italic; line-height: 1.4;" data-i18n="testi2">«Δεν επρόκειτο να μιλήσω για αυτό στον οικογενειακό μου γιατρό. Η φόρμα μου πήρε δέκα λεπτά. Είχα απάντηση την επόμενη μέρα.»</p>
+      <p class="small" style="margin-top: 10px;" data-i18n="testi2_who">— Νίκος, 41, Αθήνα</p>
+    </div>
+
+    <div class="spacer-lg"></div>
+    <p class="small center" data-i18n="home_disclaimer">Η Velos είναι πλατφόρμα τηλεϊατρικής. Οι ιατρικές αποφάσεις λαμβάνονται από αδειούχους Έλληνες γιατρούς (ΠΙΣ). Δεν πουλάμε συνταγογραφούμενα φάρμακα — η συνταγή σου εκτελείται σε οποιοδήποτε ελληνικό φαρμακείο.</p>
+  </section>
+
+  <!-- =================== CONDITIONS LIST =================== -->
+  <section class="view" id="view-conditions">
+    <button class="back" onclick="showView('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span data-i18n="back">Πίσω</span></button>
+    <div class="page-head">
+      <p class="small" style="text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600;" data-i18n="step1of4">Βήμα 1 από 4</p>
+      <h1 data-i18n="cond_h1">Διάλεξε την κατηγορία</h1>
+      <p class="sub" data-i18n="cond_sub">Κάθε κατηγορία οδηγεί σε μια ξεχωριστή κλινική φόρμα, σχεδιασμένη από Έλληνες γιατρούς.</p>
+    </div>
+    <div class="cond-grid" id="cond-grid-2"></div>
+
+    <div class="pharmacy-banner" style="margin-top: 28px;">
+      <div class="pb-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6"/><path d="M19 9a7 7 0 1 1-14 0"/><path d="M5 9h14"/><circle cx="12" cy="15" r="3"/></svg>
+      </div>
+      <div>
+        <h4 data-i18n="cond_missing_title">Δε βλέπεις αυτό που χρειάζεσαι;</h4>
+        <p data-i18n="cond_missing_body">Πες μας τι ψάχνεις και θα προσθέσουμε τον κατάλληλο ειδικό.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =================== CONDITION DETAIL =================== -->
+  <section class="view" id="view-cond-detail">
+    <button class="back" onclick="showView('conditions')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span data-i18n="back">Πίσω</span></button>
+    <div id="cond-detail-body"></div>
+  </section>
+
+  <!-- =================== INTAKE FORM =================== -->
+  <section class="view" id="view-intake">
+    <button class="back" onclick="prevQuestion()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span data-i18n="back">Πίσω</span></button>
+    <div class="progress" id="intake-progress"></div>
+    <p class="q-count" id="q-count">—</p>
+    <div id="intake-body"></div>
+    <div class="form-actions">
+      <button class="btn btn-primary" id="intake-next" onclick="nextQuestion()" data-i18n="continue">Συνέχεια</button>
+    </div>
+  </section>
+
+  <!-- =================== PATIENT INFO =================== -->
+  <section class="view" id="view-patient-info">
+    <button class="back" onclick="showView('intake'); renderIntake();"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span data-i18n="back">Πίσω</span></button>
+    <div class="page-head">
+      <p class="small" style="text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600;" data-i18n="step3of4">Βήμα 3 από 4</p>
+      <h1 data-i18n="pi_h1">Τα στοιχεία σου</h1>
+      <p class="sub" data-i18n="pi_sub">Απαραίτητα για να εκδώσει ο γιατρός την ηλεκτρονική σου συνταγή στην ΗΔΙΚΑ.</p>
+    </div>
+    <div class="field"><label data-i18n="pi_first">Όνομα</label><input type="text" id="pi-first" /></div>
+    <div class="field"><label data-i18n="pi_last">Επώνυμο</label><input type="text" id="pi-last" /></div>
+    <div class="field">
+      <label><span data-i18n="pi_amka">ΑΜΚΑ</span> <span class="small" data-i18n="pi_amka_sub">(11 ψηφία)</span></label>
+      <input type="text" id="pi-amka" inputmode="numeric" maxlength="11" oninput="this.value=this.value.replace(/\D/g,'')" placeholder="Π.χ. 01234567890" />
+      <span class="hint" data-i18n="pi_amka_hint">Απαραίτητος για τις συνταγές ΗΔΙΚΑ. Αποθηκεύεται κρυπτογραφημένα σύμφωνα με τον GDPR.</span>
+    </div>
+    <div class="field-row">
+      <div class="field"><label data-i18n="pi_dob">Ημερομηνία γέννησης</label><input type="date" id="pi-dob" /></div>
+      <div class="field"><label data-i18n="pi_sex">Φύλο</label><select id="pi-sex"><option value="" data-i18n="select">Επίλεξε</option><option value="FEMALE" data-i18n="sex_f">Γυναίκα</option><option value="MALE" data-i18n="sex_m">Άνδρας</option><option value="OTHER" data-i18n="sex_o">Άλλο</option></select></div>
+    </div>
+    <div class="field"><label data-i18n="pi_email">Email</label><input type="email" id="pi-email" /></div>
+    <div class="field"><label data-i18n="pi_phone">Κινητό τηλέφωνο</label><input type="tel" id="pi-phone" inputmode="numeric" maxlength="13" placeholder="+30 6912345678" oninput="this.value=this.value.replace(/[^\d+]/g,'').replace(/(?!^\+)\+/g,'')" /></div>
+
+    <div id="pi-password-block">
+      <div class="spacer-md"></div>
+      <div class="field">
+        <label data-i18n="pi_password">Κωδικός πρόσβασης</label>
+        <input type="password" id="pi-password" autocomplete="new-password" />
+        <span class="hint" data-i18n="pi_password_hint">Τουλάχιστον 10 χαρακτήρες</span>
+      </div>
+    </div>
+
+    <div class="spacer-md"></div>
+    <h3 style="font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; color: var(--olive); margin-bottom: 10px;" data-i18n="pi_consents">Απαιτούμενες συναινέσεις</h3>
+    <label class="consent-row" id="c1">
+      <input type="checkbox" onchange="toggleConsent(this)" />
+      <div class="ct"><b data-i18n="cs1_title">Συναίνεση τηλεϊατρικής (Ν. 3984/2011, άρ. 66)</b> <a href="#" onclick="event.preventDefault();event.stopPropagation();openModal('modal-cs1')" style="font-size:0.78rem;color:var(--olive);text-decoration:underline;font-weight:normal;">Διαβάστε →</a><span data-i18n="cs1_body">Συναινώ σε απομακρυσμένη ιατρική εξέταση από αδειούχο Έλληνα γιατρό μέσω αυτής της πλατφόρμας.</span></div>
+    </label>
+    <label class="consent-row" id="c2">
+      <input type="checkbox" onchange="toggleConsent(this)" />
+      <div class="ct"><b data-i18n="cs2_title">Επεξεργασία δεδομένων υγείας (GDPR, ειδική κατηγορία)</b> <a href="#" onclick="event.preventDefault();event.stopPropagation();openModal('modal-cs2')" style="font-size:0.78rem;color:var(--olive);text-decoration:underline;font-weight:normal;">Διαβάστε →</a><span data-i18n="cs2_body">Συναινώ στην επεξεργασία των δεδομένων υγείας μου από τον Ιπποκράτη και την κοινοποίηση μόνο στον γιατρό που εξετάζει την περίπτωσή μου.</span></div>
+    </label>
+    <label class="consent-row" id="c3">
+      <input type="checkbox" onchange="toggleConsent(this)" />
+      <div class="ct"><b data-i18n="cs3_title">Όροι & ιατρική ευθύνη</b> <a href="#" onclick="event.preventDefault();event.stopPropagation();openModal('modal-cs3')" style="font-size:0.78rem;color:var(--olive);text-decoration:underline;font-weight:normal;">Διαβάστε →</a><span data-i18n="cs3_body">Κατανοώ ότι ο γιατρός (ΠΙΣ) φέρει την κλινική ευθύνη. Η Velos είναι η πλατφόρμα, όχι ο πάροχος ιατρικών υπηρεσιών.</span></div>
+    </label>
+
+    <div class="form-actions">
+      <button class="btn btn-primary" id="pi-next" onclick="goPayment()" data-i18n="pi_cta">Συνέχεια στην πληρωμή</button>
+      <p class="small center" style="margin-top:14px;" id="pi-have-account">
+        <span data-i18n="pi_have_account">Έχεις ήδη λογαριασμό;</span>
+        <a href="#" onclick="showLoginFor('patient-info-payment'); return false;" style="color:var(--olive);font-weight:600;" data-i18n="pi_signin"> Σύνδεση</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- =================== PAYMENT =================== -->
+  <section class="view" id="view-payment">
+    <button class="back" onclick="showView('patient-info')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span data-i18n="back">Πίσω</span></button>
+    <div class="page-head">
+      <p class="small" style="text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600;" data-i18n="step4of4">Βήμα 4 από 4</p>
+      <h1 data-i18n="pay_h1">Επιβεβαίωση & πληρωμή</h1>
+      <p class="sub" data-i18n="pay_sub">Ένας αδειούχος γιατρός θα εξετάσει την περίπτωσή σου εντός 24 ωρών.</p>
+    </div>
+
+    <div class="pay-total">
+      <span class="label" data-i18n="pay_fee_label">Κόστος εξέτασης</span>
+      <span class="amount" id="pay-amount">€30</span>
+      <span class="detail" id="pay-detail" data-i18n="pay_fee_detail">Μία εξέταση · συνταγή την ίδια ημέρα εφόσον εγκριθεί</span>
+    </div>
+
+    <h3 style="font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; color: var(--olive); margin-bottom: 10px;" data-i18n="pay_sub_title">Ή εξοικονόμησε με συνδρομή</h3>
+    <div class="plan-card">
+      <span class="save-badge" data-i18n="pay_save">-40%</span>
+      <h3 data-i18n="pay_plan">Μηνιαία συνδρομή</h3>
+      <div class="plan-price">€19<small data-i18n="per_month">/μήνα</small></div>
+      <div class="plan-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="pay_feat1">Απεριόριστες ανανεώσεις για μια πάθηση</span></div>
+      <div class="plan-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="pay_feat2">Δωρεάν μηνύματα με τον γιατρό σου</span></div>
+      <div class="plan-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><span data-i18n="pay_feat3">Ακύρωση οποτεδήποτε</span></div>
+    </div>
+
+    <h3 style="font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 600; color: var(--olive); margin: 20px 0 10px;" data-i18n="pay_method">Τρόπος πληρωμής</h3>
+    <div class="pay-options" id="pay-options">
+      <div class="pay-opt selected" onclick="pickPay(this)">
+        <div class="pay-logo" style="background: #635bff; color: white;">CARD</div>
+        <div><div class="pay-name">Stripe</div><div class="pay-sub" data-i18n="pay_stripe_sub">Visa · Mastercard · Apple Pay</div></div>
+      </div>
+      <div class="pay-opt" onclick="pickPay(this)">
+        <div class="pay-logo" style="background: #ffd100; color: #1a1a1a;">VIVA</div>
+        <div><div class="pay-name">Viva Wallet</div><div class="pay-sub" data-i18n="pay_viva_sub">Ελληνικό σύστημα πληρωμών</div></div>
+      </div>
+      <div class="pay-opt" onclick="pickPay(this)">
+        <div class="pay-logo" style="background: var(--olive); color: white;">IRIS</div>
+        <div><div class="pay-name">IRIS Payments</div><div class="pay-sub" data-i18n="pay_iris_sub">Από τραπεζικό λογαριασμό (χωρίς κάρτα)</div></div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="pay-btn" onclick="submitPayment()" data-i18n="pay_cta">Πληρωμή & υποβολή</button>
+    <p class="small center" style="margin-top: 14px;" data-i18n="pay_note">Η πληρωμή γίνεται με ασφάλεια. Η περίπτωσή σου αποστέλλεται σε γιατρό μόνο μετά την πληρωμή.</p>
+  </section>
+
+  <!-- =================== CASE CONFIRMATION =================== -->
+  <section class="view" id="view-confirm">
+    <div class="status-hero">
+      <div class="check-ring">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h1 data-i18n="cf_h1">Η περίπτωσή σου είναι σε καλά χέρια</h1>
+      <p style="margin-top: 12px;" data-i18n-html="cf_sub">Ένας αδειούχος Έλληνας γιατρός θα την εξετάσει εντός <b>24 ωρών</b>. Θα σου στείλουμε SMS μόλις είναι έτοιμη η συνταγή σου.</p>
+    </div>
+
+    <div class="info-card">
+      <h3 data-i18n="cf_next">Τι ακολουθεί</h3>
+      <p style="margin-bottom: 8px;" data-i18n="cf_n1">✓ Η περίπτωσή σου μπαίνει στην ασφαλή ουρά του γιατρού</p>
+      <p style="margin-bottom: 8px;" data-i18n="cf_n2">✓ Ο γιατρός μπορεί να σου ζητήσει επιπλέον πληροφορίες</p>
+      <p style="margin-bottom: 8px;" data-i18n="cf_n3">✓ Μόλις εγκριθεί, η συνταγή εκδίδεται στην ΗΔΙΚΑ</p>
+      <p data-i18n="cf_n4">✓ Λαμβάνεις SMS — δείξε τον ΑΜΚΑ σου σε οποιοδήποτε φαρμακείο</p>
+    </div>
+
+    <div class="pharmacy-banner">
+      <div class="pb-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18l-2 8H5L3 3z"/><path d="M5 11v8h14v-8"/></svg>
+      </div>
+      <div>
+        <h4 data-i18n="ph_title">11.000+ ελληνικά φαρμακεία</h4>
+        <p data-i18n="ph_body">Χωρίς αποστολή. Χωρίς χαρτί. Μόνο ο ΑΜΚΑ σου.</p>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="showView('cases')" data-i18n="cf_cta1">Δες την περίπτωσή μου</button>
+    <button class="btn btn-ghost" onclick="showView('home')" data-i18n="cf_cta2">Πίσω στην αρχική</button>
+  </section>
+
+  <!-- =================== CASES (PATIENT) =================== -->
+  <section class="view" id="view-cases">
+    <div class="page-head">
+      <h1 data-i18n="my_care">Η φροντίδα μου</h1>
+      <p class="sub" data-i18n="my_care_sub">Όλες οι εξετάσεις και οι συνταγές σου σε ένα μέρος.</p>
+    </div>
+
+    <div id="cases-list"></div>
+
+    <div class="empty" id="cases-empty" style="display: none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6"/><path d="M9 16h6"/><path d="M9 8h6"/><rect x="5" y="3" width="14" height="18" rx="2"/></svg>
+      <p data-i18n="cases_empty">Δεν έχεις εξετάσεις ακόμα.</p>
+      <button class="btn btn-primary" style="margin-top: 16px;" onclick="showView('conditions')" data-i18n="cases_empty_cta">Ξεκίνα μία</button>
+    </div>
+  </section>
+
+  <!-- =================== CASE DETAIL =================== -->
+  <section class="view" id="view-case-detail">
+    <button class="back" onclick="showView('cases')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span data-i18n="back_all">Πίσω στη λίστα</span></button>
+    <div id="case-detail-body"></div>
+  </section>
+
+  <!-- =================== ACCOUNT =================== -->
+  <section class="view" id="view-account">
+    <div class="page-head">
+      <h1 data-i18n="account">Λογαριασμός</h1>
+    </div>
+    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
+      <div class="avatar" id="acc-avatar">Ι</div>
+      <div>
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; color: var(--olive); font-weight: 600;" id="acc-name">—</div>
+        <div class="small" id="acc-email-display">—</div>
+      </div>
+    </div>
+
+    <!-- Not logged in prompt -->
+    <div id="acc-login-prompt" style="display:none;">
+      <div class="info-card" style="text-align:center; padding:28px 20px;">
+        <p data-i18n="acc_login_prompt" style="margin-bottom:16px;">Συνδέσου για να δεις τον λογαριασμό σου.</p>
+        <button class="btn btn-primary" onclick="showLoginFor('account')" data-i18n="acc_signin">Σύνδεση / Εγγραφή</button>
+      </div>
+    </div>
+
+    <!-- Logged in rows -->
+    <div id="acc-profile-rows">
+      <hr class="divider" />
+      <div class="profile-row" onclick="openPersonalDetails()">
+        <div><div class="lbl" data-i18n="acc_pd">Προσωπικά στοιχεία</div><div class="val" data-i18n="acc_pd_sub">Όνομα, ΑΜΚΑ, ημ. γέννησης</div></div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="profile-row" onclick="openModal('subscription')">
+        <div><div class="lbl" data-i18n="acc_sub">Συνδρομή</div><div class="val" data-i18n="acc_sub_sub">Πληρωμή ανά εξέταση · αναβάθμιση στα €19/μήνα</div></div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+      <div class="profile-row" onclick="openModal('privacy')">
+        <div><div class="lbl" data-i18n="acc_priv">Απόρρητο & GDPR</div><div class="val" data-i18n="acc_priv_sub">Δεδομένα, συναινέσεις, εξαγωγή</div></div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </div>
+    </div>
+
+    <!-- Always visible rows -->
+    <hr class="divider" />
+    <div class="profile-row" onclick="openModal('language')">
+      <div><div class="lbl" data-i18n="acc_lang">Γλώσσα</div><div class="val" data-i18n="acc_lang_sub">Ελληνικά · English</div></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+    <div class="profile-row" onclick="openModal('legal')">
+      <div><div class="lbl" data-i18n="acc_legal">Νομικό πλαίσιο & άδειες</div><div class="val" data-i18n="acc_legal_sub">Ν. 5129/2024 · ΕΟΦ · ΑΠΔΠΧ</div></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+    <div class="profile-row" onclick="openModal('help')">
+      <div><div class="lbl" data-i18n="acc_help">Βοήθεια & υποστήριξη</div><div class="val">support@velos.gr</div></div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+
+    <div class="spacer-lg"></div>
+    <button id="acc-logout-btn" class="btn btn-ghost" style="display:none;color:#a64a4a;" onclick="logout()" data-i18n="acc_signout">Αποσύνδεση</button>
+    <div class="spacer-lg"></div>
+    <p class="small center" data-i18n-html="acc_footer">Velos ΙΚΕ · Αθήνα, Ελλάδα<br>Δεδομένα υγείας σε EU (Frankfurt)</p>
+  </section>
+
+  <!-- =================== HOW IT WORKS =================== -->
+  <section class="view" id="view-how">
+    <button class="back" onclick="showView('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span data-i18n="back">Πίσω</span></button>
+    <div class="page-head">
+      <h1 data-i18n="how_h1">Πώς λειτουργεί</h1>
+      <p class="sub" data-i18n="how_sub">Η πλήρης ροή του Ιπποκράτη, από τη στιγμή που κάνεις «έναρξη» μέχρι τη στιγμή που βγαίνεις από το φαρμακείο σου.</p>
+    </div>
+    <div class="steps" id="how-steps"></div>
+
+    <div class="trust" style="margin-top: 32px;">
+      <h2 data-i18n="how_legal_title">Το νομικό υπόβαθρο</h2>
+      <p data-i18n-html="how_legal_body">Ο Ν. 5129/2024 (άρθρο 66) νομιμοποίησε τις απομακρυσμένες ιατρικές εξετάσεις και τις ηλεκτρονικές συνταγές μέσω εφαρμογών τηλεϊατρικής στην Ελλάδα. Συμμορφωνόμαστε με ΕΟΦ, GDPR και ΑΠΔΠΧ. <b>Δεν</b> πουλάμε συνταγογραφούμενα φάρμακα — αυτό παραμένει παράνομο βάσει της ΔΥΓ3α/32221/2013. Η συνταγή σου εκτελείται στο φαρμακείο σου.</p>
+    </div>
+
+    <div class="spacer-lg"></div>
+    <button class="btn btn-primary" onclick="showView('conditions')" data-i18n="how_cta">Ξεκίνα την εξέτασή μου</button>
+  </section>
+
+</div>
+
+<!-- =================== BOTTOM NAV =================== -->
+<nav class="navbar">
+  <button class="nav-item active" data-nav="home" onclick="showView('home')">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></span>
+    <span data-i18n="nav_home">Αρχική</span>
+  </button>
+  <button class="nav-item" data-nav="conditions" onclick="showView('conditions')">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v8"/><path d="M8 12h8"/><circle cx="12" cy="12" r="9"/></svg></span>
+    <span data-i18n="nav_consult">Εξέταση</span>
+  </button>
+  <button class="nav-item" data-nav="cases" onclick="showView('cases')">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4"/><path d="M16 2v4"/><path d="M3 10h18"/></svg></span>
+    <span data-i18n="nav_care">Φροντίδα</span>
+  </button>
+  <button class="nav-item" data-nav="account" onclick="showView('account')">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span>
+    <span data-i18n="nav_account">Λογαριασμός</span>
+  </button>
+</nav>
+
+  <!-- =================== LOGIN =================== -->
+
+<!-- =================== MODAL =================== -->
+<div class="modal-bg" id="modal-bg" onclick="closeModal(event)">
+  <div class="modal" id="modal" onclick="event.stopPropagation()">
+    <div class="modal-grip"></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- =================== TOAST =================== -->
+<div id="error-toast" class="error-toast"></div>
+
+<script>
+/* ===========================================================
+   TRANSLATIONS — Greek (default) + English
+   =========================================================== */
+const T = {
+  el: {
+    /* generic */
+    brand: 'Velos',
+    back: 'Πίσω',
+    back_all: 'Πίσω στη λίστα',
+    continue: 'Συνέχεια',
+    select: 'Επίλεξε',
+    save: 'Αποθήκευση',
+    cancel: 'Ακύρωση',
+    per_month: '/μήνα',
+    loading: 'Φόρτωση…',
+
+    /* topbar / hero */
+    hero_eyebrow: '100% νόμιμο · ηλεκτρονική συνταγή ΗΔΙΚΑ',
+    hero_title: 'Ιατρική φροντίδα που μένει <em>μεταξύ μας.</em> Σε κάθε ελληνικό φαρμακείο.',
+    hero_lead: 'Online εξέταση με αδειούχο Έλληνα γιατρό. Η συνταγή σου σε περιμένει σε οποιοδήποτε από τα 11.000 φαρμακεία — αρκεί ο ΑΜΚΑ σου.',
+    cta_start: 'Ξεκίνα εξέταση',
+    cta_how: 'Πώς λειτουργεί →',
+    stat_pharm: 'Φαρμακεία',
+    stat_reply: 'Απάντηση γιατρού',
+    stat_consult: 'Ανά εξέταση',
+
+    home_pick: 'Για ποιο θέμα θέλεις βοήθεια;',
+    home_how: 'Πώς λειτουργεί η Velos',
+    trust_title: 'Γιατί υπάρχουμε',
+    trust_body: '~4 εκατομμύρια Έλληνες ζουν σε περιοχές με περιορισμένη πρόσβαση σε γιατρό. 6.000+ νησιά δεν έχουν ειδικούς. Κάποιες συζητήσεις — τριχόπτωση, στυτική δυσλειτουργία, ψυχική υγεία, αντισύλληψη — ξεκινούν πιο εύκολα διακριτικά. Η Velos τις κάνει ήσυχα εφικτές.',
+    pill_law: 'Σύμφωνα με Ν. 5129/2024',
+    pill_gdpr: 'GDPR + ΑΠΔΠΧ',
+    pill_eopyy: 'Συμβατό με ΕΟΠΥΥ',
+    pill_pis: 'Αδειούχοι ΠΙΣ γιατροί',
+    home_voices: 'Τι λένε οι ασθενείς μας',
+    testi1: '«Μένω στη Σκύρο. Ο πιο κοντινός δερματολόγος είναι ένα πλοίο μακριά. Πήρα τη συνταγή μου για τρετινοΐνη το Σάββατο πρωί, την παρέλαβα στο φαρμακείο του χωριού τη Δευτέρα.»',
+    testi1_who: '— Ελένη, 34, Σκύρος',
+    testi2: '«Δεν επρόκειτο να μιλήσω για αυτό στον οικογενειακό μου γιατρό. Η φόρμα μου πήρε δέκα λεπτά. Είχα απάντηση την επόμενη μέρα.»',
+    testi2_who: '— Νίκος, 41, Αθήνα',
+    home_disclaimer: 'Η Velos είναι πλατφόρμα τηλεϊατρικής. Οι ιατρικές αποφάσεις λαμβάνονται από αδειούχους Έλληνες γιατρούς (ΠΙΣ). Δεν πουλάμε συνταγογραφούμενα φάρμακα — η συνταγή σου εκτελείται σε οποιοδήποτε ελληνικό φαρμακείο.',
+
+    /* steps */
+    s1_t: 'Διάλεξε την πάθηση', s1_b: 'Απάντησε σε μια σύντομη ιατρική φόρμα σχεδιασμένη από Έλληνες γιατρούς. Πρόσθεσε φωτογραφίες αν χρειάζεται.',
+    s2_t: 'Αδειούχος γιατρός εξετάζει', s2_b: 'Ένας γιατρός ή ειδικός εγγεγραμμένος στον ΠΙΣ εξετάζει την περίπτωσή σου εντός 24 ωρών.',
+    s3_t: 'Έκδοση ηλεκτρονικής συνταγής', s3_b: 'Εκδίδεται στο εθνικό σύστημα ΗΔΙΚΑ. Λαμβάνεις άμεσα ειδοποίηση με SMS.',
+    s4_t: 'Παραλαβή σε οποιοδήποτε φαρμακείο', s4_b: 'Δείξε τον ΑΜΚΑ σου σε οποιοδήποτε από τα 11.000 ελληνικά φαρμακεία. Χωρίς χαρτί, χωρίς QR.',
+    s5_t: 'Πληρωμή €25–€45', s5_b: 'Stripe, Viva Wallet ή IRIS. Η πληρωμή ξεκλειδώνει την ουρά του γιατρού. Διαθέσιμες συνδρομές για επαναλαμβανόμενες παθήσεις.',
+    s6_t: 'Ηλεκτρονική συνταγή στην ΗΔΙΚΑ', s6_b: 'Εφόσον εγκριθεί, η συνταγή εισέρχεται άμεσα στο εθνικό σύστημα ΗΔΙΚΑ, συνδεδεμένη με τον ΑΜΚΑ σου. Χωρίς χαρτί.',
+    s7_t: 'Ανανέωση με ένα tap', s7_b: '30–60 ημέρες αργότερα σου στέλνουμε υπενθύμιση. Ένα tap, σύντομη επανεξέταση, νέα συνταγή.',
+
+    /* conditions list page */
+    step1of4: 'Βήμα 1 από 4',
+    step3of4: 'Βήμα 3 από 4',
+    step4of4: 'Βήμα 4 από 4',
+    cond_h1: 'Διάλεξε την κατηγορία',
+    cond_sub: 'Κάθε κατηγορία οδηγεί σε μια ξεχωριστή κλινική φόρμα, σχεδιασμένη από Έλληνες γιατρούς.',
+    cond_missing_title: 'Δε βλέπεις αυτό που χρειάζεσαι;',
+    cond_missing_body: 'Πες μας τι ψάχνεις και θα προσθέσουμε τον κατάλληλο ειδικό.',
+    cond_eyebrow: 'Online ιατρική εξέταση',
+    cond_from: 'Από',
+    cond_within: 'απάντηση γιατρού εντός 24 ωρών',
+    cond_included: 'Τι περιλαμβάνεται',
+    cond_included_body: 'Ένας αδειούχος Έλληνας γιατρός (ΠΙΣ) θα εξετάσει την περίπτωσή σου, θα αποφασίσει την κλινική πορεία και θα εκδώσει την ηλεκτρονική συνταγή σου στο εθνικό σύστημα ΗΔΙΚΑ. Παραλαμβάνεις από οποιοδήποτε φαρμακείο με τον ΑΜΚΑ σου.',
+    cond_treatments: 'Θεραπείες που καλύπτουμε',
+    cond_long_title: 'Πόσος χρόνος χρειάζεται;',
+    cond_long_body: 'Οι περισσότεροι ασθενείς ολοκληρώνουν τη φόρμα σε λιγότερο από 5 λεπτά. Ο γιατρός απαντά εντός 24 ωρών — συχνά την ίδια ημέρα. Η συνταγή σου είναι διαθέσιμη σε οποιοδήποτε ελληνικό φαρμακείο μόλις εκδοθεί στην ΗΔΙΚΑ.',
+    cond_start: 'Ξεκίνα την εξέταση →',
+    cond_back: 'Πίσω στις κατηγορίες',
+
+    /* intake */
+    intake_q_of: 'Ερώτηση {n} από {tot}',
+    intake_next_last: 'Συνέχεια στα στοιχεία →',
+
+    /* photo upload */
+    up_title: 'Πρόσθεσε φωτογραφία',
+    up_sub: 'JPEG ή PNG, έως 10 MB',
+    up_note: 'Η φωτογραφία αποθηκεύεται κρυπτογραφημένα και κοινοποιείται μόνο στον γιατρό σου.',
+    up_alert: 'Η φωτογραφία θα ζητηθεί μετά την υποβολή.',
+    up_selected: '{n} φωτογραφία επιλέχθηκε',
+    up_drag: 'ή σύρε και άσε εδώ',
+    ta_type: 'Πληκτρολόγησε εδώ…',
+    ta_optional: 'Προαιρετικό…',
+
+    /* patient info */
+    pi_h1: 'Τα στοιχεία σου',
+    pi_sub: 'Απαραίτητα για να εκδώσει ο γιατρός την ηλεκτρονική σου συνταγή στην ΗΔΙΚΑ.',
+    pi_first: 'Όνομα',
+    pi_last: 'Επώνυμο',
+    pi_amka: 'ΑΜΚΑ',
+    pi_amka_sub: '(11 ψηφία)',
+    pi_amka_hint: 'Απαραίτητος για τις συνταγές ΗΔΙΚΑ. Αποθηκεύεται κρυπτογραφημένα σύμφωνα με τον GDPR.',
+    pi_dob: 'Ημερομηνία γέννησης',
+    pi_sex: 'Φύλο',
+    sex_f: 'Γυναίκα', sex_m: 'Άνδρας', sex_o: 'Άλλο',
+    pi_email: 'Email',
+    pi_phone: 'Κινητό τηλέφωνο',
+    pi_consents: 'Απαιτούμενες συναινέσεις',
+    cs1_title: 'Συναίνεση τηλεϊατρικής (Ν. 3984/2011, άρ. 66)',
+    cs1_body: 'Συναινώ σε απομακρυσμένη ιατρική εξέταση από αδειούχο Έλληνα γιατρό μέσω αυτής της πλατφόρμας.',
+    cs2_title: 'Επεξεργασία δεδομένων υγείας (GDPR, ειδική κατηγορία)',
+    cs2_body: 'Συναινώ στην επεξεργασία των δεδομένων υγείας μου από τον Ιπποκράτη και την κοινοποίηση μόνο στον γιατρό που εξετάζει την περίπτωσή μου.',
+    cs3_title: 'Όροι & ιατρική ευθύνη',
+    cs3_body: 'Κατανοώ ότι ο γιατρός (ΠΙΣ) φέρει την κλινική ευθύνη. Η Velos είναι η πλατφόρμα, όχι ο πάροχος ιατρικών υπηρεσιών.',
+    pi_password: 'Κωδικός πρόσβασης',
+    pi_password_hint: 'Τουλάχιστον 10 χαρακτήρες',
+    pi_cta: 'Δημιούργησε λογαριασμό & συνέχεια',
+    pi_have_account: 'Έχεις ήδη λογαριασμό;',
+    pi_signin: ' Σύνδεση',
+    pi_alert_missing: 'Συμπλήρωσε όνομα, ΑΜΚΑ και email — απαραίτητα για τις συνταγές ΗΔΙΚΑ.',
+    pi_alert_amka: 'Ο ΑΜΚΑ πρέπει να έχει ακριβώς 11 ψηφία.',
+    pi_alert_phone: 'Εισήγαγε έγκυρο ελληνικό κινητό (π.χ. 6912345678).',
+    pi_alert_consents: 'Επιβεβαίωσε και τις τρεις συναινέσεις — απαιτείται από τον ελληνικό νόμο.',
+    pi_alert_password: 'Ο κωδικός πρέπει να έχει τουλάχιστον 10 χαρακτήρες.',
+    pi_alert_fix_fields: 'Συμπλήρωσε όλα τα υποχρεωτικά πεδία.',
+    pi_alert_email_exists: 'Αυτό το email είναι ήδη καταχωρημένο. Δοκίμασε να συνδεθείς ή χρησιμοποίησε άλλο email.',
+    field_required: 'Υποχρεωτικό πεδίο',
+
+    /* login */
+    login_h1: 'Σύνδεση',
+    login_sub: 'Καλώς ήρθες πίσω',
+    login_password: 'Κωδικός',
+    login_cta: 'Σύνδεση',
+    login_no_account: 'Δεν έχεις λογαριασμό;',
+    login_register: ' Εγγραφή',
+    login_alert_missing: 'Συμπλήρωσε email και κωδικό.',
+    login_error: 'Λανθασμένα στοιχεία. Δοκίμασε ξανά.',
+
+    /* payment */
+    pay_h1: 'Επιβεβαίωση & πληρωμή',
+    pay_sub: 'Ένας αδειούχος γιατρός θα εξετάσει την περίπτωσή σου εντός 24 ωρών.',
+    pay_fee_label: 'Κόστος εξέτασης',
+    pay_fee_detail: 'Μία εξέταση · συνταγή την ίδια ημέρα εφόσον εγκριθεί',
+    pay_fee_detail_fmt: '{name} · συνταγή την ίδια ημέρα εφόσον εγκριθεί',
+    pay_sub_title: 'Ή εξοικονόμησε με συνδρομή',
+    pay_save: '-40%',
+    pay_plan: 'Μηνιαία συνδρομή',
+    pay_feat1: 'Απεριόριστες ανανεώσεις για μια πάθηση',
+    pay_feat2: 'Δωρεάν μηνύματα με τον γιατρό σου',
+    pay_feat3: 'Ακύρωση οποτεδήποτε',
+    pay_method: 'Τρόπος πληρωμής',
+    pay_stripe_sub: 'Visa · Mastercard · Apple Pay',
+    pay_viva_sub: 'Ελληνικό σύστημα πληρωμών',
+    pay_iris_sub: 'Από τραπεζικό λογαριασμό (χωρίς κάρτα)',
+    pay_cta: 'Πληρωμή & υποβολή',
+    pay_note: 'Η πληρωμή γίνεται με ασφάλεια. Η περίπτωσή σου αποστέλλεται σε γιατρό μόνο μετά την πληρωμή.',
+    pay_paid_with: 'Πληρώθηκε με',
+    pay_redirect: 'Ανακατεύθυνση στην πύλη πληρωμών…',
+
+    /* confirmation */
+    cf_h1: 'Η περίπτωσή σου είναι σε καλά χέρια',
+    cf_sub: 'Ένας αδειούχος Έλληνας γιατρός θα την εξετάσει εντός <b>24 ωρών</b>. Θα σου στείλουμε SMS μόλις είναι έτοιμη η συνταγή σου.',
+    cf_next: 'Τι ακολουθεί',
+    cf_n1: '✓ Η περίπτωσή σου μπαίνει στην ασφαλή ουρά του γιατρού',
+    cf_n2: '✓ Ο γιατρός μπορεί να σου ζητήσει επιπλέον πληροφορίες',
+    cf_n3: '✓ Μόλις εγκριθεί, η συνταγή εκδίδεται στην ΗΔΙΚΑ',
+    cf_n4: '✓ Λαμβάνεις SMS — δείξε τον ΑΜΚΑ σου σε οποιοδήποτε φαρμακείο',
+    ph_title: '11.000+ ελληνικά φαρμακεία',
+    ph_body: 'Χωρίς αποστολή. Χωρίς χαρτί. Μόνο ο ΑΜΚΑ σου.',
+    cf_cta1: 'Δες την περίπτωσή μου',
+    cf_cta2: 'Πίσω στην αρχική',
+
+    /* cases */
+    my_care: 'Η φροντίδα μου',
+    my_care_sub: 'Όλες οι εξετάσεις και οι συνταγές σου σε ένα μέρος.',
+    cases_empty: 'Δεν έχεις εξετάσεις ακόμα.',
+    cases_empty_cta: 'Ξεκίνα μία',
+    cases_login_prompt: 'Συνδέσου για να δεις τις εξετάσεις σου.',
+    error_load_cases: 'Δεν ήταν δυνατή η φόρτωση των εξετάσεων.',
+    badge_new: 'Νέα',
+    badge_review: 'Σε εξέταση',
+    badge_rx: 'Συνταγή έτοιμη',
+    badge_info: 'Αναμένει πληροφορίες',
+    badge_done: 'Ολοκληρώθηκε',
+    case_submitted_label: 'Υποβλήθηκε',
+    case_doctor_assigning: 'Ανατίθεται γιατρός…',
+    case_just_now: 'Μόλις τώρα',
+    t_minutes_ago: 'Πριν {n} λεπτά',
+    t_hours_ago: 'Πριν {n} ώρες',
+    t_days_ago: 'Πριν {n} μέρες',
+
+    /* timeline */
+    tl_submitted: 'Υποβολή & πληρωμή',
+    tl_paid_fmt: 'Πληρώθηκε {when} · €{amount} · {method}',
+    tl_review: 'Εξέταση από γιατρό',
+    tl_review_queue: 'Ο γιατρός σου εξετάζει εντός 24 ωρών',
+    tl_review_queue_fmt: 'Εκτιμώμενη αναμονή: {hours} ώρες',
+    tl_review_done_fmt: 'Εξετάστηκε {time}',
+    tl_rx: 'Ηλεκτρονική συνταγή ΗΔΙΚΑ',
+    tl_rx_done_fmt: 'Εκδόθηκε · Κωδικός ΗΔΙΚΑ: {id}',
+    tl_rx_dash: 'Εκκρεμεί',
+    tl_pickup: 'Παραλαβή στο φαρμακείο',
+    tl_pickup_active: 'Δείξε τον ΑΜΚΑ σου σε οποιοδήποτε φαρμακείο',
+    tl_renew: 'Ανανέωση',
+    tl_renew_body: 'Θα σου στείλουμε υπενθύμιση σε 30–60 ημέρες',
+
+    /* case detail */
+    cd_timeline: 'Πορεία περίπτωσης',
+    cd_msg_title: 'Μήνυμα στον γιατρό',
+    cd_msg_body: 'Έχεις απορίες για τη συνταγή σου; Ο γιατρός σου απαντά.',
+    cd_msg_ph_fmt: 'Γράψε στον {doctor}…',
+    cd_send: 'Αποστολή',
+    cd_renew: 'Ανανέωση συνταγής',
+
+    /* rx ready */
+    rx_ready_title: 'Η συνταγή σου είναι έτοιμη',
+    rx_ready_sub_fmt: '{rx} — παραλαβή με τον ΑΜΚΑ σου',
+    rx_see: 'δες λεπτομέρειες',
+
+    /* account */
+    account: 'Λογαριασμός',
+    acc_welcome: 'Καλωσόρισες',
+    acc_email_empty: '—',
+    acc_login_prompt: 'Συνδέσου για να δεις τον λογαριασμό σου.',
+    acc_signin: 'Σύνδεση / Εγγραφή',
+    acc_signout: 'Αποσύνδεση',
+    acc_pd: 'Προσωπικά στοιχεία',
+    acc_pd_sub: 'Όνομα, ΑΜΚΑ, ημ. γέννησης',
+    acc_sub: 'Συνδρομή',
+    acc_sub_sub: 'Πληρωμή ανά εξέταση · αναβάθμιση στα €19/μήνα',
+    acc_lang: 'Γλώσσα',
+    acc_lang_sub: 'Ελληνικά · English',
+    acc_priv: 'Απόρρητο & GDPR',
+    acc_priv_sub: 'Δεδομένα, συναινέσεις, εξαγωγή',
+    acc_legal: 'Νομικό πλαίσιο & άδειες',
+    acc_legal_sub: 'Ν. 5129/2024 · ΕΟΦ · ΑΠΔΠΧ',
+    acc_help: 'Βοήθεια & υποστήριξη',
+    acc_footer: 'Velos ΙΚΕ · Αθήνα, Ελλάδα<br>Δεδομένα υγείας σε EU (Frankfurt)',
+
+    /* nav */
+    nav_home: 'Αρχική',
+    nav_consult: 'Εξέταση',
+    nav_care: 'Φροντίδα',
+    nav_account: 'Λογαριασμός',
+
+    /* GDPR */
+    gdpr_delete_confirm: 'Είσαι σίγουρος; Αυτή η ενέργεια διαγράφει μόνιμα τον λογαριασμό σου και δεν αναιρείται.',
+
+    /* modals */
+    mod_sub_title: 'Μηνιαία συνδρομή',
+    mod_sub_body: 'Εξοικονόμησε έως 40% με τη μηνιαία συνδρομή. Ιδανικό για χρόνιες παθήσεις.',
+    mod_sub_feat1: '✓ Απεριόριστες επανεξετάσεις για μια πάθηση',
+    mod_sub_feat2: '✓ Προτεραιότητα ουράς',
+    mod_sub_feat3: '✓ Δωρεάν μηνύματα',
+    mod_sub_feat4: '✓ Ακύρωση οποτεδήποτε',
+    mod_sub_cta: 'Σύντομα διαθέσιμο',
+    mod_lang_title: 'Γλώσσα',
+    mod_lang_beta: 'Η αγγλική μετάφραση βρίσκεται σε beta.',
+    mod_priv_title: 'Απόρρητο & GDPR',
+    mod_priv_body: 'Τα δεδομένα υγείας σου (ΑΜΚΑ, ημ. γέννησης, απαντήσεις ιατρικής φόρμας) κρυπτογραφούνται με AES-256-GCM πριν την αποθήκευση. Μόνο ο γιατρός που εξετάζει την περίπτωσή σου έχει πρόσβαση.',
+    mod_priv_h: 'Τα δικαιώματά σου (GDPR)',
+    mod_priv_p: 'Έχεις δικαίωμα πρόσβασης, διόρθωσης και διαγραφής των δεδομένων σου. Μπορείς να κατεβάσεις όλα σου τα δεδομένα ή να ζητήσεις μόνιμη διαγραφή.',
+    mod_priv_export: 'Εξαγωγή δεδομένων (JSON)',
+    mod_priv_delete: 'Διαγραφή λογαριασμού',
+    mod_legal_title: 'Νομικό πλαίσιο',
+    mod_legal_1t: 'Ν. 5129/2024, άρθρο 66', mod_legal_1b: 'Νομιμοποιεί τις απομακρυσμένες ιατρικές εξετάσεις και τις ηλεκτρονικές συνταγές μέσω εφαρμογών τηλεϊατρικής.',
+    mod_legal_2t: 'ΔΥΓ3α/32221/2013', mod_legal_2b: 'Απαγορεύει την online πώληση συνταγογραφούμενων φαρμάκων. Η Velos δεν πουλά φάρμακα.',
+    mod_legal_3t: 'GDPR Άρθρο 9', mod_legal_3b: 'Δεδομένα υγείας = ειδική κατηγορία. Υποχρεωτική κρυπτογράφηση και ΥΠΔ.',
+    mod_legal_4t: 'ΠΙΣ', mod_legal_4b: 'Όλοι οι γιατροί είναι εγγεγραμμένοι στον Πανελλήνιο Ιατρικό Σύλλογο και φέρουν επαγγελματική ευθύνη.',
+    mod_help_title: 'Βοήθεια & υποστήριξη',
+    mod_help_body: 'Είμαστε εδώ για εσένα. Επικοινώνησε μαζί μας μέσω email ή τηλεφώνου.',
+    mod_help_email_l: 'Email', mod_help_phone_l: 'Τηλέφωνο', mod_help_chat_l: 'Live chat', mod_help_chat_v: 'Σύντομα διαθέσιμο',
+    mod_help_em: 'Ιατρικές επείγουσες ανάγκες: καλέστε 112',
+    mod_crisis_title: 'Χρειάζεσαι βοήθεια τώρα',
+    mod_crisis_body: 'Αν αντιμετωπίζεις κρίση, παρακαλούμε επικοινώνησε με τις παρακάτω υπηρεσίες. Είναι διαθέσιμες 24/7.',
+    mod_crisis_h1: 'Γραμμή ζωής', mod_crisis_v1: '10306 — 24 ώρες, δωρεάν',
+    mod_crisis_h2: 'Άμεση βοήθεια', mod_crisis_v2: '112 ή 166 (ΕΚΑΒ)',
+    mod_crisis_cta: 'Πίσω στην αρχική',
+    mod_crisis_em: 'Η εφαρμογή αυτή δεν παρέχει υπηρεσίες κρίσης.',
+    mod_renew_title: 'Ανανέωση συνταγής',
+    mod_renew_body: 'Ο γιατρός σου θα επανεξετάσει σύντομα την περίπτωσή σου.',
+    mod_renew_h: 'Έχεις κάτι νέο να αναφέρεις;',
+    mod_renew_p: 'Πες στον γιατρό αν κάτι άλλαξε από την τελευταία φορά.',
+    mod_renew_cta: 'Υποβολή ανανέωσης',
+    mod_renew_note: 'Η ανανέωση θα εξεταστεί εντός 24 ωρών.',
+    mod_renew_alert: 'Η ανανέωση υποβλήθηκε! Ο γιατρός σου θα απαντήσει σύντομα.',
+    mod_personal_title: 'Προσωπικά στοιχεία',
+    mod_personal_body: 'Αυτά τα στοιχεία χρησιμοποιούνται για τις συνταγές ΗΔΙΚΑ.',
+
+    /* nav */
+    how_h1: 'Πώς λειτουργεί',
+    how_sub: 'Η πλήρης ροή του Ιπποκράτη, από τη στιγμή που κάνεις «έναρξη» μέχρι τη στιγμή που βγαίνεις από το φαρμακείο σου.',
+    how_legal_title: 'Το νομικό υπόβαθρο',
+    how_legal_body: 'Ο Ν. 5129/2024 (άρθρο 66) νομιμοποίησε τις απομακρυσμένες ιατρικές εξετάσεις και τις ηλεκτρονικές συνταγές μέσω εφαρμογών τηλεϊατρικής στην Ελλάδα. Συμμορφωνόμαστε με ΕΟΦ, GDPR και ΑΠΔΠΧ. <b>Δεν</b> πουλάμε συνταγογραφούμενα φάρμακα — αυτό παραμένει παράνομο βάσει της ΔΥΓ3α/32221/2013. Η συνταγή σου εκτελείται στο φαρμακείο σου.',
+    how_cta: 'Ξεκίνα την εξέτασή μου',
+  },
+  en: {
+    brand: 'Velos',
+    back: 'Back',
+    back_all: 'Back to list',
+    continue: 'Continue',
+    select: 'Select',
+    save: 'Save',
+    cancel: 'Cancel',
+    per_month: '/month',
+    loading: 'Loading…',
+
+    hero_eyebrow: '100% legal · IDIKA e-prescription',
+    hero_title: 'Medical care that stays <em>between us.</em> At every Greek pharmacy.',
+    hero_lead: 'Online consultation with a licensed Greek doctor. Your prescription is waiting at any of 11,000 pharmacies — just your AMKA.',
+    cta_start: 'Start consultation',
+    cta_how: 'How it works →',
+    stat_pharm: 'Pharmacies',
+    stat_reply: 'Doctor reply',
+    stat_consult: 'Per consultation',
+
+    home_pick: 'What do you need help with?',
+    home_how: 'How Velos works',
+    trust_title: 'Why we exist',
+    trust_body: '~4 million Greeks live in areas with limited doctor access. 6,000+ islands have no specialists. Some conversations — hair loss, ED, mental health, contraception — are easier to start privately. Velos makes them quietly possible.',
+    pill_law: 'Under Law 5129/2024',
+    pill_gdpr: 'GDPR + HDPA',
+    pill_eopyy: 'EOPYY compatible',
+    pill_pis: 'PIS-licensed doctors',
+    home_voices: 'What our patients say',
+    testi1: '«I live on Skyros. The nearest dermatologist is a ferry ride away. I got my tretinoin prescription Saturday morning, picked it up at the village pharmacy Monday.»',
+    testi1_who: '— Eleni, 34, Skyros',
+    testi2: '«I was never going to talk about this with my family doctor. The form took ten minutes. I had an answer the next day.»',
+    testi2_who: '— Nikos, 41, Athens',
+    home_disclaimer: 'Velos is a telemedicine platform. Medical decisions are made by licensed Greek doctors (PIS). We do not sell prescription drugs — your prescription is fulfilled at any Greek pharmacy.',
+
+    s1_t: 'Choose a condition', s1_b: 'Answer a short medical form designed by Greek doctors. Add photos if needed.',
+    s2_t: 'Licensed doctor reviews', s2_b: 'A PIS-registered doctor or specialist reviews your case within 24 hours.',
+    s3_t: 'E-prescription issued', s3_b: 'Issued in the IDIKA national system. You receive an SMS notification immediately.',
+    s4_t: 'Pick up at any pharmacy', s4_b: 'Show your AMKA at any of 11,000 Greek pharmacies. No paper, no QR.',
+    s5_t: 'Pay €25–€45', s5_b: 'Stripe, Viva Wallet or IRIS. Payment unlocks the doctor queue. Subscriptions available for recurring conditions.',
+    s6_t: 'E-prescription in IDIKA', s6_b: 'Once approved, the prescription enters the IDIKA national system immediately, linked to your AMKA. No paper.',
+    s7_t: 'Renew with one tap', s7_b: '30–60 days later we send a reminder. One tap, brief re-examination, new prescription.',
+
+    step1of4: 'Step 1 of 4',
+    step3of4: 'Step 3 of 4',
+    step4of4: 'Step 4 of 4',
+    cond_h1: 'Choose a category',
+    cond_sub: 'Each category leads to a separate clinical form, designed by Greek doctors.',
+    cond_missing_title: "Don't see what you need?",
+    cond_missing_body: "Tell us what you're looking for and we'll add the right specialist.",
+    cond_eyebrow: 'Online medical consultation',
+    cond_from: 'From',
+    cond_within: 'doctor reply within 24 hours',
+    cond_included: "What's included",
+    cond_included_body: 'A licensed Greek doctor (PIS) will review your case, decide on the clinical course and issue your e-prescription in the IDIKA national system. Pick up at any pharmacy with your AMKA.',
+    cond_treatments: 'Treatments we cover',
+    cond_long_title: 'How long does it take?',
+    cond_long_body: 'Most patients complete the form in under 5 minutes. The doctor replies within 24 hours — often the same day. Your prescription is available at any Greek pharmacy once issued in IDIKA.',
+    cond_start: 'Start consultation →',
+    cond_back: 'Back to categories',
+
+    intake_q_of: 'Question {n} of {tot}',
+    intake_next_last: 'Continue to your details →',
+
+    up_title: 'Add a photo',
+    up_sub: 'JPEG or PNG, up to 10 MB',
+    up_note: 'Your photo is stored encrypted and shared only with your doctor.',
+    up_alert: 'Photo upload will be available after submission.',
+    up_selected: '{n} photo selected',
+    up_drag: 'or drag and drop here',
+    ta_type: 'Type here…',
+    ta_optional: 'Optional…',
+
+    pi_h1: 'Your details',
+    pi_sub: 'Required for your doctor to issue your e-prescription in IDIKA.',
+    pi_first: 'First name',
+    pi_last: 'Last name',
+    pi_amka: 'AMKA',
+    pi_amka_sub: '(11 digits)',
+    pi_amka_hint: 'Required for IDIKA prescriptions. Stored encrypted in accordance with GDPR.',
+    pi_dob: 'Date of birth',
+    pi_sex: 'Sex',
+    sex_f: 'Female', sex_m: 'Male', sex_o: 'Other',
+    pi_email: 'Email',
+    pi_phone: 'Mobile phone',
+    pi_consents: 'Required consents',
+    cs1_title: 'Telemedicine consent (Law 3984/2011, art. 66)',
+    cs1_body: 'I consent to a remote medical examination by a licensed Greek doctor through this platform.',
+    cs2_title: 'Health data processing (GDPR, special category)',
+    cs2_body: 'I consent to the processing of my health data by Velos and sharing only with the doctor reviewing my case.',
+    cs3_title: 'Terms & medical liability',
+    cs3_body: 'I understand that the doctor (PIS) bears clinical liability. Velos is the platform, not the medical services provider.',
+    pi_password: 'Password',
+    pi_password_hint: 'At least 10 characters',
+    pi_cta: 'Create account & continue',
+    pi_have_account: 'Already have an account?',
+    pi_signin: ' Sign in',
+    pi_alert_missing: 'Fill in name, AMKA and email — required for IDIKA prescriptions.',
+    pi_alert_amka: 'AMKA must be exactly 11 digits.',
+    pi_alert_phone: 'Enter a valid Greek mobile number (e.g. 6912345678).',
+    pi_alert_consents: 'Confirm all three consents — required by Greek law.',
+    pi_alert_password: 'Password must be at least 10 characters.',
+    pi_alert_fix_fields: 'Please fill in all required fields.',
+    pi_alert_email_exists: 'This email is already registered. Try logging in or use a different email.',
+    field_required: 'Required',
+
+    login_h1: 'Sign in',
+    login_sub: 'Welcome back',
+    login_password: 'Password',
+    login_cta: 'Sign in',
+    login_no_account: "Don't have an account?",
+    login_register: ' Register',
+    login_alert_missing: 'Enter your email and password.',
+    login_error: 'Invalid credentials. Please try again.',
+
+    pay_h1: 'Confirm & pay',
+    pay_sub: 'A licensed doctor will review your case within 24 hours.',
+    pay_fee_label: 'Consultation fee',
+    pay_fee_detail: 'One consultation · same-day prescription if approved',
+    pay_fee_detail_fmt: '{name} · same-day prescription if approved',
+    pay_sub_title: 'Or save with a subscription',
+    pay_save: '-40%',
+    pay_plan: 'Monthly subscription',
+    pay_feat1: 'Unlimited renewals for one condition',
+    pay_feat2: 'Free messages with your doctor',
+    pay_feat3: 'Cancel anytime',
+    pay_method: 'Payment method',
+    pay_stripe_sub: 'Visa · Mastercard · Apple Pay',
+    pay_viva_sub: 'Greek payment system',
+    pay_iris_sub: 'From bank account (no card needed)',
+    pay_cta: 'Pay & submit',
+    pay_note: 'Payment is secure. Your case is sent to a doctor only after payment.',
+    pay_paid_with: 'Paid with',
+    pay_redirect: 'Redirecting to payment gateway…',
+
+    cf_h1: 'Your case is in good hands',
+    cf_sub: 'A licensed Greek doctor will review it within <b>24 hours</b>. We\'ll send you an SMS when your prescription is ready.',
+    cf_next: "What's next",
+    cf_n1: '✓ Your case enters the secure doctor queue',
+    cf_n2: '✓ The doctor may ask for additional information',
+    cf_n3: '✓ Once approved, the prescription is issued in IDIKA',
+    cf_n4: '✓ You receive an SMS — show your AMKA at any pharmacy',
+    ph_title: '11,000+ Greek pharmacies',
+    ph_body: 'No delivery. No paper. Just your AMKA.',
+    cf_cta1: 'View my case',
+    cf_cta2: 'Back to home',
+
+    my_care: 'My care',
+    my_care_sub: 'All your consultations and prescriptions in one place.',
+    cases_empty: "You don't have any consultations yet.",
+    cases_empty_cta: 'Start one',
+    cases_login_prompt: 'Sign in to see your consultations.',
+    error_load_cases: 'Could not load consultations.',
+    badge_new: 'New',
+    badge_review: 'In review',
+    badge_rx: 'Prescription ready',
+    badge_info: 'Awaiting info',
+    badge_done: 'Completed',
+    case_submitted_label: 'Submitted',
+    case_doctor_assigning: 'Assigning doctor…',
+    case_just_now: 'Just now',
+    t_minutes_ago: '{n} min ago',
+    t_hours_ago: '{n}h ago',
+    t_days_ago: '{n}d ago',
+
+    tl_submitted: 'Submitted & paid',
+    tl_paid_fmt: 'Paid {when} · €{amount} · {method}',
+    tl_review: 'Doctor review',
+    tl_review_queue: 'Your doctor is reviewing within 24 hours',
+    tl_review_queue_fmt: 'Estimated wait: {hours} hours',
+    tl_review_done_fmt: 'Reviewed {time}',
+    tl_rx: 'IDIKA e-prescription',
+    tl_rx_done_fmt: 'Issued · IDIKA ref: {id}',
+    tl_rx_dash: 'Pending',
+    tl_pickup: 'Pharmacy pick-up',
+    tl_pickup_active: 'Show your AMKA at any pharmacy',
+    tl_renew: 'Renewal',
+    tl_renew_body: "We'll send a reminder in 30–60 days",
+
+    cd_timeline: 'Case progress',
+    cd_msg_title: 'Message your doctor',
+    cd_msg_body: 'Questions about your prescription? Your doctor replies.',
+    cd_msg_ph_fmt: 'Write to {doctor}…',
+    cd_send: 'Send',
+    cd_renew: 'Renew prescription',
+
+    rx_ready_title: 'Your prescription is ready',
+    rx_ready_sub_fmt: '{rx} — pick up with your AMKA',
+    rx_see: 'see details',
+
+    account: 'Account',
+    acc_welcome: 'Welcome',
+    acc_email_empty: '—',
+    acc_login_prompt: 'Sign in to view your account.',
+    acc_signin: 'Sign in / Register',
+    acc_signout: 'Sign out',
+    acc_pd: 'Personal details',
+    acc_pd_sub: 'Name, AMKA, date of birth',
+    acc_sub: 'Subscription',
+    acc_sub_sub: 'Pay per consultation · upgrade at €19/month',
+    acc_lang: 'Language',
+    acc_lang_sub: 'Greek · English',
+    acc_priv: 'Privacy & GDPR',
+    acc_priv_sub: 'Data, consents, export',
+    acc_legal: 'Legal framework & licences',
+    acc_legal_sub: 'Law 5129/2024 · EOF · HDPA',
+    acc_help: 'Help & support',
+    acc_footer: 'Velos IKE · Athens, Greece<br>Health data hosted in EU (Frankfurt)',
+
+    nav_home: 'Home',
+    nav_consult: 'Consult',
+    nav_care: 'My care',
+    nav_account: 'Account',
+
+    gdpr_delete_confirm: 'Are you sure? This permanently deletes your account and cannot be undone.',
+
+    mod_sub_title: 'Monthly subscription',
+    mod_sub_body: 'Save up to 40% with a monthly subscription. Ideal for chronic conditions.',
+    mod_sub_feat1: '✓ Unlimited re-examinations for one condition',
+    mod_sub_feat2: '✓ Priority queue',
+    mod_sub_feat3: '✓ Free messages',
+    mod_sub_feat4: '✓ Cancel anytime',
+    mod_sub_cta: 'Coming soon',
+    mod_lang_title: 'Language',
+    mod_lang_beta: 'English translation is in beta.',
+    mod_priv_title: 'Privacy & GDPR',
+    mod_priv_body: 'Your health data (AMKA, date of birth, medical form answers) is encrypted with AES-256-GCM before storage. Only the doctor reviewing your case has access.',
+    mod_priv_h: 'Your rights (GDPR)',
+    mod_priv_p: 'You have the right to access, correct and delete your data. You can download all your data or request permanent deletion.',
+    mod_priv_export: 'Export data (JSON)',
+    mod_priv_delete: 'Delete account',
+    mod_legal_title: 'Legal framework',
+    mod_legal_1t: 'Law 5129/2024, article 66', mod_legal_1b: 'Legalises remote medical examinations and e-prescriptions via telemedicine apps.',
+    mod_legal_2t: 'DYG3a/32221/2013', mod_legal_2b: 'Prohibits online sale of prescription drugs. Velos does not sell drugs.',
+    mod_legal_3t: 'GDPR Article 9', mod_legal_3b: 'Health data = special category. Mandatory encryption and DPO.',
+    mod_legal_4t: 'PIS', mod_legal_4b: 'All doctors are registered with the Panhellenic Medical Association and carry professional liability.',
+    mod_help_title: 'Help & support',
+    mod_help_body: "We're here for you. Contact us by email or phone.",
+    mod_help_email_l: 'Email', mod_help_phone_l: 'Phone', mod_help_chat_l: 'Live chat', mod_help_chat_v: 'Coming soon',
+    mod_help_em: 'Medical emergencies: call 112',
+    mod_crisis_title: 'You need help now',
+    mod_crisis_body: 'If you are in crisis, please contact the services below. Available 24/7.',
+    mod_crisis_h1: 'Lifeline', mod_crisis_v1: '10306 — 24 hours, free',
+    mod_crisis_h2: 'Emergency', mod_crisis_v2: '112 or 166 (EKAV)',
+    mod_crisis_cta: 'Back to home',
+    mod_crisis_em: 'This app does not provide crisis services.',
+    mod_renew_title: 'Prescription renewal',
+    mod_renew_body: 'Your doctor will re-examine your case shortly.',
+    mod_renew_h: 'Anything new to report?',
+    mod_renew_p: 'Tell your doctor if anything has changed since last time.',
+    mod_renew_cta: 'Submit renewal',
+    mod_renew_note: 'Renewal will be reviewed within 24 hours.',
+    mod_renew_alert: 'Renewal submitted! Your doctor will reply shortly.',
+    mod_personal_title: 'Personal details',
+    mod_personal_body: 'These details are used for IDIKA prescriptions.',
+
+    how_h1: 'How it works',
+    how_sub: "The full Velos flow, from when you tap 'start' to when you leave your pharmacy.",
+    how_legal_title: 'The legal background',
+    how_legal_body: 'Law 5129/2024 (article 66) legalised remote medical examinations and e-prescriptions via telemedicine apps in Greece. We comply with EOF, GDPR and HDPA. We do <b>not</b> sell prescription drugs — this remains illegal under DYG3a/32221/2013. Your prescription is fulfilled at your pharmacy.',
+    how_cta: 'Start my consultation',
+  }
+};
+
+/* ===========================================================
+   API BASE — change to your live domain before production
+   =========================================================== */
+
+/* =====================================================
+   DEMO MODE — intercepts all fetch() calls to localhost:4000
+   and returns realistic mock responses so the full
+   patient journey works without any backend running.
+   ===================================================== */
+
+const DEMO_USER = {
+  id: 'demo-patient-001',
+  email: 'giorgos@example.com',
+  role: 'PATIENT',
+  language: 'EL',
+  firstName: 'Γιώργος',
+  lastName: 'Παπαδόπουλος',
+};
+
+const DEMO_TOKENS = {
+  accessToken: 'demo-access-token',
+  refreshToken: 'demo-refresh-token',
+};
+
+const DEMO_CASES = [
+  {
+    id: 'demo-case-001',
+    publicId: 'VL-2026-3842',
+    condition: 'HAIR_LOSS',
+    status: 'PRESCRIPTION_ISSUED',
+    submittedAt: new Date(Date.now() - 4*24*60*60*1000).toISOString(),
+    decisionAt:  new Date(Date.now() - 3*24*60*60*1000).toISOString(),
+    doctor: { firstName: 'Αθανάσιος', lastName: 'Νικολάου' },
+    payments: [{ amountEurCents: 3000, provider: 'STRIPE',
+      createdAt: new Date(Date.now() - 4*24*60*60*1000).toISOString() }],
+    prescriptions: [{ idikaRef: 'IDIKA-2026-78421' }],
+  },
+  {
+    id: 'demo-case-002',
+    publicId: 'VL-2026-5291',
+    condition: 'SKIN_ACNE',
+    status: 'IN_REVIEW',
+    submittedAt: new Date(Date.now() - 6*60*60*1000).toISOString(),
+    decisionAt: null,
+    doctor: { firstName: 'Μαρία', lastName: 'Κωνσταντίνου' },
+    payments: [{ amountEurCents: 3000, provider: 'VIVA',
+      createdAt: new Date(Date.now() - 6*60*60*1000).toISOString() }],
+    prescriptions: [],
+  },
+];
+
+const _realFetch = window.fetch.bind(window);
+window.fetch = async function(url, opts) {
+  if (typeof url === 'string' && url.includes('localhost:4000')) {
+    const path = url.replace(/.*localhost:4000\/api\/v1/, '');
+    const method = (opts && opts.method) ? opts.method.toUpperCase() : 'GET';
+    await new Promise(r => setTimeout(r, 220)); // realistic latency
+
+    // Auth
+    if (path === '/auth/login' || path === '/auth/refresh')
+      return mockOk({ tokens: DEMO_TOKENS, user: DEMO_USER });
+    if (path === '/auth/logout')
+      return mockStatus(204);
+
+    // Cases list
+    if (path === '/cases/mine' && method === 'GET')
+      return mockOk([...DEMO_CASES, ...(window._demoCases || [])]);
+
+    // Create case
+    if (path === '/cases' && method === 'POST') {
+      const body = opts && opts.body ? JSON.parse(opts.body) : {};
+      const newCase = {
+        id: 'demo-case-new-' + Date.now(),
+        publicId: 'VL-2026-' + (Math.floor(Math.random() * 9000) + 1000),
+        condition: body.condition || 'HAIR_LOSS',
+        status: 'AWAITING_DOCTOR',
+        submittedAt: new Date().toISOString(),
+        decisionAt: null,
+        doctor: null,
+        payments: [],
+        prescriptions: [],
+      };
+      window._demoCases = window._demoCases || [];
+      window._demoCases.unshift(newCase);
+      window._lastNewCase = newCase;
+      return mockOk(newCase);
+    }
+
+    // Initiate payment — return empty object → triggers dev-mode confirm flow
+    if (path === '/payments/initiate' && method === 'POST') {
+      if (window._lastNewCase) {
+        window._lastNewCase.status = 'AWAITING_DOCTOR';
+        window._lastNewCase.payments = [{
+          amountEurCents: (CONDITIONS[state.currentCondition]?.price || 30) * 100,
+          provider: 'STRIPE',
+          createdAt: new Date().toISOString(),
+        }];
+      }
+      return mockOk({}); // no redirectUrl → dev-mode path → showView('confirm')
+    }
+
+    // S3 photo upload (presigned URL)
+    if (method === 'PUT') return mockStatus(200);
+
+    // Photo upload request
+    if (path.includes('/photos/request-upload'))
+      return mockOk({ uploadUrl: 'https://example.com/mock-s3', key: 'mock-key' });
+
+    // Case detail
+    const caseMatch = path.match(/\/cases\/([^/]+)$/);
+    if (caseMatch && method === 'GET') {
+      const all = [...DEMO_CASES, ...(window._demoCases || [])];
+      const found = all.find(c => c.id === caseMatch[1]);
+      return found ? mockOk(found) : mockStatus(404);
+    }
+
+    // Logout, GDPR export, anything else
+    return mockOk({});
+  }
+  // Non-API calls (Google Fonts, etc.) pass through normally
+  return _realFetch(url, opts);
+};
+
+function mockOk(data) {
+  return Promise.resolve(new Response(JSON.stringify(data), {
+    status: 200, headers: { 'Content-Type': 'application/json' }
+  }));
+}
+function mockStatus(code) {
+  return Promise.resolve(new Response(null, { status: code }));
+}
+
+const API_BASE = 'http://localhost:4000/api/v1';
+
+/* ===========================================================
+   CONDITIONS (unchanged from Phase 0 prototype)
+   =========================================================== */
+const CONDITIONS = {
+  hair: {
+    id: 'hair', color: 'green', icon: '💊',
+    name: { el: 'Τριχόπτωση', en: 'Hair Loss' },
+    blurb: { el: 'Finasteride, Minoxidil και εξατομικευμένη αγωγή.', en: 'Finasteride, Minoxidil and personalised treatment.' },
+    price: 30,
+    treatments: [
+      { type: 'Rx', name: { el: 'Finasteride 1mg', en: 'Finasteride 1mg' }, meta: { el: 'Καθημερινά · 3–6 μήνες για αποτέλεσμα', en: 'Daily · 3–6 months for results' } },
+      { type: 'Rx', name: { el: 'Minoxidil 5% (τοπικό)', en: 'Minoxidil 5% (topical)' }, meta: { el: 'Τοπική εφαρμογή', en: 'Topical application' } },
+      { type: 'OTC', name: { el: 'Βιοτίνη / Zinc', en: 'Biotin / Zinc' }, meta: { el: 'Συμπληρώματα', en: 'Supplements' } },
+    ],
+    questions: [
+      { q: { el: 'Πού παρατηρείς την τριχόπτωση;', en: 'Where do you notice the hair loss?' }, type: 'choice', opts: { el: ['Κορυφή / στέμμα', 'Μπροστά / γραμμή τριχοφυΐας', 'Πλευρές / κρόταφοι', 'Γενικευμένη αραίωση'], en: ['Top / crown', 'Front / hairline', 'Sides / temples', 'General thinning'] } },
+      { q: { el: 'Πόσο καιρό έχεις αυτό το πρόβλημα;', en: 'How long have you had this problem?' }, type: 'choice', opts: { el: ['Λιγότερο από 6 μήνες', '6–12 μήνες', '1–3 χρόνια', 'Πάνω από 3 χρόνια'], en: ['Less than 6 months', '6–12 months', '1–3 years', 'Over 3 years'] } },
+      { q: { el: 'Υπάρχει οικογενειακό ιστορικό τριχόπτωσης;', en: 'Is there a family history of hair loss?' }, type: 'choice', opts: { el: ['Ναι, πατρική πλευρά', 'Ναι, μητρική πλευρά', 'Και στις δύο πλευρές', 'Όχι / Δεν ξέρω'], en: ['Yes, paternal side', 'Yes, maternal side', 'Both sides', 'No / Don\'t know'] } },
+      { q: { el: 'Παίρνεις αυτήν τη στιγμή κάποιο φάρμακο;', en: 'Are you currently taking any medication?' }, type: 'textarea' },
+      { q: { el: 'Πρόσθεσε φωτογραφία (προαιρετικό)', en: 'Add a photo (optional)' }, type: 'upload' },
+    ]
+  },
+  ed: {
+    id: 'ed', color: 'blue', icon: '🫀',
+    name: { el: 'Στυτική Δυσλειτουργία', en: 'Erectile Dysfunction' },
+    blurb: { el: 'Sildenafil, Tadalafil — διακριτικά και ασφαλώς.', en: 'Sildenafil, Tadalafil — discreetly and safely.' },
+    price: 35,
+    treatments: [
+      { type: 'Rx', name: { el: 'Sildenafil 50/100mg', en: 'Sildenafil 50/100mg' }, meta: { el: 'Βραχείας δράσης', en: 'Short-acting' } },
+      { type: 'Rx', name: { el: 'Tadalafil 5/20mg', en: 'Tadalafil 5/20mg' }, meta: { el: 'Μακράς δράσης / καθημερινό', en: 'Long-acting / daily' } },
+    ],
+    questions: [
+      { q: { el: 'Πόσο συχνά αντιμετωπίζεις αυτό το πρόβλημα;', en: 'How often do you experience this problem?' }, type: 'choice', opts: { el: ['Περιστασιακά', 'Μερικές φορές', 'Τις περισσότερες φορές', 'Πάντα'], en: ['Occasionally', 'Sometimes', 'Most of the time', 'Always'] } },
+      { q: { el: 'Έχεις διαγνωστεί με καρδιαγγειακή νόσο ή διαβήτη;', en: 'Have you been diagnosed with cardiovascular disease or diabetes?' }, type: 'choice', opts: { el: ['Όχι', 'Καρδιαγγειακή νόσος', 'Διαβήτης', 'Και τα δύο'], en: ['No', 'Cardiovascular disease', 'Diabetes', 'Both'] } },
+      { q: { el: 'Παίρνεις νιτρώδη (νιτρογλυκερίνη, ισοσορβίδη);', en: 'Are you taking nitrates (nitroglycerin, isosorbide)?' }, type: 'choice', opts: { el: ['Ναι', 'Όχι', 'Δεν ξέρω'], en: ['Yes', 'No', "Don't know"] } },
+      { q: { el: 'Άλλα φάρμακα ή παρατηρήσεις;', en: 'Other medications or notes?' }, type: 'textarea' },
+    ]
+  },
+  skin: {
+    id: 'skin', color: 'terra', icon: '✨',
+    name: { el: 'Ακμή & Δέρμα', en: 'Acne & Skin' },
+    blurb: { el: 'Tretinoin, αντιβιοτικά και εξατομικευμένα πρωτόκολλα.', en: 'Tretinoin, antibiotics and personalised protocols.' },
+    price: 30,
+    treatments: [
+      { type: 'Rx', name: { el: 'Tretinoin 0.025–0.1%', en: 'Tretinoin 0.025–0.1%' }, meta: { el: 'Τοπικό ρετινοειδές', en: 'Topical retinoid' } },
+      { type: 'Rx', name: { el: 'Αντιβιοτικά τοπικά', en: 'Topical antibiotics' }, meta: { el: 'Clindamycin κ.ά.', en: 'Clindamycin etc.' } },
+      { type: 'OTC', name: { el: 'Benzoyl Peroxide', en: 'Benzoyl Peroxide' }, meta: { el: 'Αντιβακτηριακό', en: 'Antibacterial' } },
+    ],
+    questions: [
+      { q: { el: 'Πού εμφανίζεται κυρίως η ακμή;', en: 'Where does the acne mainly appear?' }, type: 'choice', opts: { el: ['Πρόσωπο', 'Πλάτη / ώμοι', 'Στήθος', 'Πολλές περιοχές'], en: ['Face', 'Back / shoulders', 'Chest', 'Multiple areas'] } },
+      { q: { el: 'Πόση ώρα έχεις αυτό το πρόβλημα;', en: 'How long have you had this problem?' }, type: 'choice', opts: { el: ['Λιγότερο από 3 μήνες', '3–12 μήνες', 'Πάνω από 1 χρόνο', 'Χρόνια / εφηβεία'], en: ['Less than 3 months', '3–12 months', 'Over 1 year', 'Years / since teens'] } },
+      { q: { el: 'Πρόσθεσε φωτογραφία της πάθησης', en: 'Add a photo of the condition' }, type: 'upload' },
+      { q: { el: 'Έχεις χρησιμοποιήσει προηγουμένως θεραπείες;', en: 'Have you used treatments before?' }, type: 'textarea' },
+    ]
+  },
+  mind: {
+    id: 'mind', color: 'sky', icon: '🧠',
+    name: { el: 'Ψυχική Υγεία & Ύπνος', en: 'Mental Health & Sleep' },
+    blurb: { el: 'Αντικαταθλιπτικά, αγχολυτικά, βοήθεια ύπνου.', en: 'Antidepressants, anxiolytics, sleep aids.' },
+    price: 45,
+    treatments: [
+      { type: 'Rx', name: { el: 'SSRI / SNRI', en: 'SSRI / SNRI' }, meta: { el: 'Αντικαταθλιπτικά', en: 'Antidepressants' } },
+      { type: 'Rx', name: { el: 'Βοήθεια ύπνου', en: 'Sleep aids' }, meta: { el: 'Μελατονίνη Rx, Zolpidem', en: 'Rx melatonin, Zolpidem' } },
+    ],
+    questions: [
+      { q: { el: 'Τι σε δυσκολεύει κυρίως;', en: 'What is mainly bothering you?' }, type: 'choice', opts: { el: ['Άγχος', 'Κατάθλιψη / χαμηλή διάθεση', 'Πρόβλημα ύπνου', 'Παραπάνω από ένα'], en: ['Anxiety', 'Depression / low mood', 'Sleep problem', 'More than one'] } },
+      { q: { el: 'Πόσο καιρό διαρκεί αυτό;', en: 'How long has this been going on?' }, type: 'choice', opts: { el: ['Λιγότερο από 1 μήνα', '1–3 μήνες', '3–12 μήνες', 'Πάνω από 1 χρόνο'], en: ['Less than 1 month', '1–3 months', '3–12 months', 'Over 1 year'] } },
+      { q: { el: 'Έχεις σκέψεις να βλάψεις τον εαυτό σου;', en: 'Do you have thoughts of harming yourself?' }, type: 'choice', opts: { el: ['Όχι', 'Σπάνια', 'Συχνά'], en: ['No', 'Rarely', 'Often'] } },
+      { q: { el: 'Παίρνεις αυτήν τη στιγμή κάποιο φάρμακο;', en: 'Are you currently taking any medication?' }, type: 'textarea' },
+    ]
+  },
+  weight: {
+    id: 'weight', color: 'gold', icon: '⚖️',
+    name: { el: 'Βάρος & Μεταβολισμός', en: 'Weight & Metabolism' },
+    blurb: { el: 'GLP-1 αγωνιστές και μεταβολική υποστήριξη.', en: 'GLP-1 agonists and metabolic support.' },
+    price: 40,
+    treatments: [
+      { type: 'Rx', name: { el: 'Semaglutide (Ozempic/Wegovy)', en: 'Semaglutide (Ozempic/Wegovy)' }, meta: { el: 'GLP-1 αγωνιστής', en: 'GLP-1 agonist' } },
+      { type: 'Rx', name: { el: 'Metformin', en: 'Metformin' }, meta: { el: 'Ινσουλινοευαισθητοποιητής', en: 'Insulin sensitiser' } },
+    ],
+    questions: [
+      { q: { el: 'Ύψος & βάρος', en: 'Height & weight' }, type: 'text2', labels: { el: ['Ύψος (cm)', 'Βάρος (kg)'], en: ['Height (cm)', 'Weight (kg)'] } },
+      { q: { el: 'Έχεις διαγνωστεί με διαβήτη τύπου 2;', en: 'Have you been diagnosed with type 2 diabetes?' }, type: 'choice', opts: { el: ['Ναι', 'Όχι', 'Prediabetes'], en: ['Yes', 'No', 'Prediabetes'] } },
+      { q: { el: 'Έχεις δοκιμάσει άλλες θεραπείες;', en: 'Have you tried other treatments?' }, type: 'textarea' },
+    ]
+  },
+  women: {
+    id: 'women', color: 'rose', icon: '🌸',
+    name: { el: "Γυναικεία Υγεία", en: "Women's Health" },
+    blurb: { el: 'Αντισύλληψη, ορμόνες, γυναικολογικά θέματα.', en: 'Contraception, hormones, gynaecological issues.' },
+    price: 35,
+    treatments: [
+      { type: 'Rx', name: { el: 'Αντισυλληπτικά χάπια', en: 'Contraceptive pill' }, meta: { el: 'Συνδυαστικά ή προγεστερόνη μόνο', en: 'Combined or progestogen-only' } },
+      { type: 'Rx', name: { el: 'HRT', en: 'HRT' }, meta: { el: 'Εμμηνόπαυση', en: 'Menopause' } },
+    ],
+    questions: [
+      { q: { el: 'Τι σε φέρνει σήμερα;', en: 'What brings you here today?' }, type: 'choice', opts: { el: ['Αντισύλληψη', 'Εμμηνόπαυση / HRT', 'Κολπικές λοιμώξεις', 'Άλλο γυναικολογικό'], en: ['Contraception', 'Menopause / HRT', 'Vaginal infections', 'Other gynaecological'] } },
+      { q: { el: 'Τελευταία έμμηνος ρύση', en: 'Last period' }, type: 'date' },
+      { q: { el: 'Παίρνεις αυτήν τη στιγμή αντισυλληπτικά;', en: 'Are you currently taking contraceptives?' }, type: 'choice', opts: { el: ['Ναι', 'Όχι', 'Ήμουν στο παρελθόν'], en: ['Yes', 'No', 'Used to'] } },
+      { q: { el: 'Άλλα φάρμακα ή σχετικές πληροφορίες;', en: 'Other medications or relevant information?' }, type: 'textarea' },
+    ]
+  }
+};
+
+/* ===========================================================
+   CONDITION → BACKEND ENUM MAPPING
+   =========================================================== */
+const COND_TO_API = {
+  hair: 'HAIR_LOSS',
+  ed: 'ERECTILE_DYSFUNCTION',
+  skin: 'SKIN_ACNE',
+  mind: 'MIND_SLEEP',
+  weight: 'WEIGHT_METABOLIC',
+  women: 'WOMENS_HEALTH',
+};
+const API_TO_COND = Object.fromEntries(Object.entries(COND_TO_API).map(([k,v])=>[v,k]));
+
+/* ===========================================================
+   APP STATE
+   =========================================================== */
+const state = {
+  lang: 'el',
+  view: 'home',
+  currentCondition: null,
+  intakeStep: 0,
+  intakeAnswers: {},
+  intakePhotos: [],       // File objects staged for upload after case creation
+  auth: {
+    accessToken: null,
+    refreshToken: null,
+    user: null,           // { id, email, role, language }
+  },
+  patient: {},            // locally-held profile (first, last, amka…) for the current session
+  cases: [],              // loaded from GET /cases/mine
+  pendingCaseId: null,    // internal DB id after POST /cases (before payment redirect)
+  consents: { c1: false, c2: false, c3: false },
+  _loginReturn: null,     // where to go after login
+};
+
+/* ── DEMO: auto-login so recruiter lands straight in the app ── */
+(function initDemoAuth() {
+  state.auth.accessToken  = DEMO_TOKENS.accessToken;
+  state.auth.refreshToken = DEMO_TOKENS.refreshToken;
+  state.auth.user         = DEMO_USER;
+  state.patient           = { first: 'Γιώργος', last: 'Παπαδόπουλος', email: 'giorgos@example.com' };
+  state.cases             = [...DEMO_CASES];
+})();
+
+
+/* ===========================================================
+   SESSION PERSISTENCE
+   accessToken  → memory only (refreshed automatically)
+   refreshToken → sessionStorage (survives page reload, cleared on tab close)
+   =========================================================== */
+function loadSession() {
+  try {
+    const rt = sessionStorage.getItem('hp_rt');
+    const u  = sessionStorage.getItem('hp_user');
+    if (rt && u) {
+      state.auth.refreshToken = rt;
+      state.auth.user = JSON.parse(u);
+      // accessToken will be lazily refreshed on first API call
+    }
+  } catch(e) {}
+}
+function saveSession() {
+  try {
+    if (state.auth.refreshToken) {
+      sessionStorage.setItem('hp_rt', state.auth.refreshToken);
+      sessionStorage.setItem('hp_user', JSON.stringify(state.auth.user));
+    } else {
+      clearSession();
+    }
+  } catch(e) {}
+}
+function clearSession() {
+  state.auth = { accessToken: null, refreshToken: null, user: null };
+  state.patient = {};
+  state.cases = [];
+  try {
+    sessionStorage.removeItem('hp_rt');
+    sessionStorage.removeItem('hp_user');
+  } catch(e) {}
+}
+
+/* ===========================================================
+   API HELPER
+   Attaches Bearer token, auto-refreshes on 401, throws on error.
+   =========================================================== */
+let _refreshingPromise = null;
+
+async function apiFetch(method, path, body) {
+  // If we have a refresh token but no access token, proactively refresh
+  if (!state.auth.accessToken && state.auth.refreshToken) {
+    await _doRefresh();
+  }
+
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+  };
+  if (state.auth.accessToken) {
+    opts.headers['Authorization'] = 'Bearer ' + state.auth.accessToken;
+  }
+  if (body !== undefined) opts.body = JSON.stringify(body);
+
+  let res = await fetch(API_BASE + path, opts);
+
+  // 401 — try refresh once then retry
+  if (res.status === 401 && state.auth.refreshToken) {
+    await _doRefresh();
+    if (state.auth.accessToken) {
+      opts.headers['Authorization'] = 'Bearer ' + state.auth.accessToken;
+      res = await fetch(API_BASE + path, opts);
+    }
+  }
+
+  if (!res.ok) {
+    let msg = 'HTTP ' + res.status;
+    try { const e = await res.json(); msg = e.message || msg; } catch(x) {}
+    throw new Error(msg);
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+async function _doRefresh() {
+  if (_refreshingPromise) return _refreshingPromise;
+  _refreshingPromise = (async () => {
+    try {
+      const res = await fetch(API_BASE + '/auth/refresh', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken: state.auth.refreshToken }),
+      });
+      if (!res.ok) { clearSession(); return; }
+      const data = await res.json();
+      state.auth.accessToken  = data.tokens.accessToken;
+      state.auth.refreshToken = data.tokens.refreshToken;
+      state.auth.user         = data.user;
+      saveSession();
+    } catch(e) {
+      clearSession();
+    } finally {
+      _refreshingPromise = null;
+    }
+  })();
+  return _refreshingPromise;
+}
+
+/* ===========================================================
+   HELPERS
+   =========================================================== */
+function tr(key) { return (T[state.lang] && T[state.lang][key]) || (T.el[key] || key); }
+function fmt(template, vars) {
+  let s = template;
+  for (const k in vars) s = s.split('{' + k + '}').join(vars[k]);
+  return s;
+}
+function L(obj) { return obj && (obj[state.lang] || obj.el || obj.en || ''); }
+
+function setLoading(btnId, on) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = on;
+  if (on) {
+    btn.dataset.orig = btn.textContent;
+    btn.textContent = tr('loading');
+  } else if (btn.dataset.orig) {
+    btn.textContent = btn.dataset.orig;
+  }
+}
+
+function showError(msg) {
+  const t = document.getElementById('error-toast');
+  if (t) {
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 4000);
+  } else {
+    alert(msg);
+  }
+}
+
+function formatRelativeTime(iso) {
+  if (!iso) return '—';
+  const diff = Date.now() - new Date(iso).getTime();
+  const min  = Math.floor(diff / 60000);
+  const hr   = Math.floor(diff / 3600000);
+  const day  = Math.floor(diff / 86400000);
+  if (min < 2)  return tr('case_just_now');
+  if (min < 60) return fmt(tr('t_minutes_ago'), { n: min });
+  if (hr  < 24) return fmt(tr('t_hours_ago'),   { n: hr  });
+  return fmt(tr('t_days_ago'), { n: day });
+}
+
+/* ===========================================================
+   LANGUAGE SWITCHER
+   =========================================================== */
+function setLanguage(lang) {
+  if (!T[lang]) return;
+  state.lang = lang;
+  try { localStorage.setItem('velos_lang', lang); } catch(e) {}
+  applyLanguage();
+}
+function applyLanguage() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = tr(key);
+    if (val) el.textContent = val;
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.getAttribute('data-i18n-html');
+    const val = tr(key);
+    if (val) el.innerHTML = val;
+  });
+  document.documentElement.lang = state.lang;
+  document.title = state.lang === 'el'
+    ? 'Velos — Διακριτική ιατρική φροντίδα, σε κάθε ελληνικό φαρμακείο'
+    : 'Velos — Discreet medical care at every Greek pharmacy';
+  document.getElementById('lang-el').classList.toggle('active', state.lang === 'el');
+  document.getElementById('lang-en').classList.toggle('active', state.lang === 'en');
+  renderConditionGrids();
+  renderHomeSteps();
+  renderHowSteps();
+  if (state.view === 'cond-detail' && state.currentCondition) openCondition(state.currentCondition);
+  if (state.view === 'intake') renderIntake();
+  if (state.view === 'case-detail' && state._lastCase) openCaseDetail(state._lastCase);
+  if (state.view === 'payment' && state.currentCondition) {
+    const c = CONDITIONS[state.currentCondition];
+    const el = document.getElementById('pay-amount');
+    if (el) el.textContent = '€' + c.price;
+    const det = document.getElementById('pay-detail');
+    if (det) det.textContent = fmt(tr('pay_fee_detail_fmt'), { name: L(c.name) });
+  }
+}
+
+/* ===========================================================
+   NAV / VIEWS
+   =========================================================== */
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const v = document.getElementById('view-' + name);
+  if (v) v.classList.add('active');
+  state.view = name;
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navMap = {
+    home: 'home', conditions: 'conditions', 'cond-detail': 'conditions',
+    intake: 'conditions', 'patient-info': 'conditions', payment: 'conditions',
+    confirm: 'cases', cases: 'cases', 'case-detail': 'cases',
+    account: 'account', how: 'home', login: 'account',
+  };
+  const navKey = navMap[name];
+  if (navKey) {
+    const navEl = document.querySelector('.nav-item[data-nav="' + navKey + '"]');
+    if (navEl) navEl.classList.add('active');
+  }
+  window.scrollTo({ top: 0, behavior: "instant" });
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+
+  // Side-effects when navigating to certain views
+  if (name === 'cases') {
+    if (!state.auth.user) {
+      showCasesLoginPrompt();
+    } else {
+      fetchAndRenderCases();
+    }
+  }
+  if (name === 'account') {
+    renderAccount();
+  }
+  if (name === 'patient-info') {
+    updatePatientInfoForAuthState();
+  }
+}
+
+/* Show login prompt inside cases view if not logged in */
+function showCasesLoginPrompt() {
+  const list  = document.getElementById('cases-list');
+  const empty = document.getElementById('cases-empty');
+  if (empty) empty.style.display = 'none';
+  if (list) {
+    list.innerHTML =
+      '<div class="info-card" style="text-align:center;padding:32px 20px;margin-top:16px;">' +
+      '<p style="margin-bottom:16px;" data-i18n="cases_login_prompt">' + tr('cases_login_prompt') + '</p>' +
+      '<button class="btn btn-primary" onclick="showLoginFor(\'cases\')">' + tr('acc_signin') + '</button>' +
+      '</div>';
+  }
+}
+
+/* Hide/show password block depending on login state */
+function updatePatientInfoForAuthState() {
+  const block = document.getElementById('pi-password-block');
+  const hint  = document.getElementById('pi-have-account');
+  if (!block) return;
+  if (state.auth.user) {
+    block.style.display = 'none';
+    if (hint) hint.style.display = 'none';
+  } else {
+    block.style.display = 'block';
+    if (hint) hint.style.display = 'block';
+  }
+}
+
+/* ===========================================================
+   CONDITION GRID + DETAIL
+   =========================================================== */
+function renderConditionGrids() {
+  const html = Object.values(CONDITIONS).map(c => `
+    <button class="cond-card cond-${c.color}" onclick="openCondition('${c.id}')">
+      <div class="cond-icon">${c.icon}</div>
+      <h3>${L(c.name)}</h3>
+      <div class="price">${tr('cond_from')} <b>€${c.price}</b></div>
+    </button>
+  `).join('');
+  ['cond-grid', 'cond-grid-2'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+  });
+}
+
+function openCondition(id) {
+  const c = CONDITIONS[id];
+  state.currentCondition = id;
+  const body = document.getElementById('cond-detail-body');
+  body.innerHTML = `
+    <div class="cond-hero h-${c.color}">
+      <span class="hero-eyebrow"><span style="font-size:14px;">${c.icon}</span> ${tr('cond_eyebrow')}</span>
+      <h1 style="margin-top:12px;">${L(c.name)}</h1>
+      <p style="margin-top:10px;">${L(c.blurb)}</p>
+      <div class="price-tag">${tr('cond_from')} <b>€${c.price}</b> · ${tr('cond_within')}</div>
+    </div>
+    <div class="info-card">
+      <h3>${tr('cond_included')}</h3>
+      <p>${tr('cond_included_body')}</p>
+    </div>
+    <div class="section-title" style="margin-top:18px;"><h2>${tr('cond_treatments')}</h2></div>
+    <div class="treatments">
+      ${c.treatments.map(t => `
+        <div class="tx-row">
+          <span class="tx-pill ${t.type === 'Rx' ? 'rx' : 'otc'}">${t.type}</span>
+          <div style="flex:1;">
+            <div class="tx-name">${L(t.name)}</div>
+            <div class="tx-meta">${L(t.meta)}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="info-card">
+      <h3>${tr('cond_long_title')}</h3>
+      <p>${tr('cond_long_body')}</p>
+    </div>
+    <button class="btn btn-primary" onclick="startIntake('${c.id}')" style="margin-top:18px;">${tr('cond_start')}</button>
+    <button class="btn btn-ghost" onclick="showView('conditions')">${tr('cond_back')}</button>
+  `;
+  showView('cond-detail');
+}
+
+/* ===========================================================
+   HOME / HOW STEPS
+   =========================================================== */
+function renderHomeSteps() {
+  const el = document.getElementById('home-steps');
+  if (!el) return;
+  el.innerHTML = [1,2,3,4].map(n => `
+    <div class="step">
+      <div class="step-num">${n}</div>
+      <div><h4>${tr('s'+n+'_t')}</h4><p>${tr('s'+n+'_b')}</p></div>
+    </div>
+  `).join('');
+}
+function renderHowSteps() {
+  const el = document.getElementById('how-steps');
+  if (!el) return;
+  el.innerHTML = [1,2,3,4,5,6,7].map(n => `
+    <div class="step">
+      <div class="step-num">${n}</div>
+      <div><h4>${tr('s'+n+'_t')}</h4><p>${tr('s'+n+'_b')}</p></div>
+    </div>
+  `).join('');
+}
+
+/* ===========================================================
+   INTAKE
+   =========================================================== */
+function startIntake(id) {
+  state.currentCondition = id;
+  state.intakeStep = 0;
+  state.intakeAnswers = {};
+  state.intakePhotos = [];
+  renderIntake();
+  showView('intake');
+}
+function renderIntake() {
+  const c = CONDITIONS[state.currentCondition];
+  if (!c) return;
+  const qs = c.questions;
+  const i  = state.intakeStep;
+  const q  = qs[i];
+  const progress = document.getElementById('intake-progress');
+  progress.innerHTML = qs.map((_, idx) =>
+    `<div class="progress-bar ${idx < i ? 'done' : idx === i ? 'active' : ''}"></div>`
+  ).join('');
+  document.getElementById('q-count').textContent =
+    fmt(tr('intake_q_of'), { n: i + 1, tot: qs.length }) + ' · ' + L(c.name);
+
+  const body = document.getElementById('intake-body');
+  let html = `<h2 class="q-title">${L(q.q)}</h2>`;
+
+  if (q.type === 'choice') {
+    const opts = L(q.opts);
+    html += `<div class="options">${opts.map((opt, idx) => `
+      <button class="opt ${state.intakeAnswers[i] === idx ? 'selected' : ''}" onclick="pickOption(${idx})">
+        <span class="opt-marker"></span>
+        <span>${opt}</span>
+      </button>
+    `).join('')}</div>`;
+  } else if (q.type === 'text') {
+    html += `<div class="field"><input type="text" id="q-input" value="${state.intakeAnswers[i] || ''}" placeholder="${tr('ta_type')}" /></div>`;
+  } else if (q.type === 'textarea') {
+    html += `<div class="field"><textarea id="q-input" rows="5" placeholder="${tr('ta_optional')}">${state.intakeAnswers[i] || ''}</textarea></div>`;
+  } else if (q.type === 'date') {
+    html += `<div class="field"><input type="date" id="q-input" value="${state.intakeAnswers[i] || ''}" /></div>`;
+  } else if (q.type === 'text2') {
+    const v      = state.intakeAnswers[i] || ['', ''];
+    const labels = L(q.labels);
+    html += `<div class="field-row">
+      <div class="field"><label>${labels[0]}</label><input type="text" id="q-input-a" value="${v[0]}" /></div>
+      <div class="field"><label>${labels[1]}</label><input type="text" id="q-input-b" value="${v[1]}" /></div>
+    </div>`;
+  } else if (q.type === 'upload') {
+    const photoCount = state.intakePhotos ? state.intakePhotos.length : 0;
+    html += `
+      <div class="upload" id="photo-dropzone" onclick="document.getElementById('q-photo-input').click()">
+        <input type="file" id="q-photo-input" accept="image/*" multiple style="display:none"
+               onchange="handlePhotoSelect(event)" />
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 16V4"/><path d="M8 8l4-4 4 4"/>
+          <path d="M20 16v2a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2"/>
+        </svg>
+        <div style="font-weight:500;color:var(--olive);margin-bottom:2px;">${tr('up_title')}</div>
+        <div>${photoCount > 0 ? fmt(tr('up_selected'), { n: photoCount }) : tr('up_sub')}</div>
+        <div style="font-size:0.78rem;color:var(--muted);margin-top:4px;">${tr('up_drag')}</div>
+      </div>
+      <p class="small center" style="margin-top:10px;">${tr('up_note')}</p>`;
+  }
+
+  body.innerHTML = html;
+  initDropzone();
+  document.getElementById('intake-next').textContent =
+    i === qs.length - 1 ? tr('intake_next_last') : tr('continue');
+}
+function handlePhotoSelect(event) {
+  state.intakePhotos = Array.from(event.target.files);
+  renderIntake();
+}
+function initDropzone() {
+  const zone = document.getElementById("photo-dropzone");
+  if (!zone) return;
+  zone.addEventListener("dragover", function(e) {
+    e.preventDefault();
+    zone.classList.add("drag-over");
+  });
+  zone.addEventListener("dragleave", function(e) {
+    if (!zone.contains(e.relatedTarget)) zone.classList.remove("drag-over");
+  });
+  zone.addEventListener("drop", function(e) {
+    e.preventDefault();
+    zone.classList.remove("drag-over");
+    const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith("image/"));
+    if (files.length) { state.intakePhotos = files; renderIntake(); }
+  });
+}
+function pickOption(idx) { state.intakeAnswers[state.intakeStep] = idx; renderIntake(); }
+function nextQuestion() {
+  const c = CONDITIONS[state.currentCondition];
+  const i = state.intakeStep;
+  const q = c.questions[i];
+  if (q.type === 'text' || q.type === 'textarea' || q.type === 'date') {
+    const el = document.getElementById('q-input');
+    if (el) state.intakeAnswers[i] = el.value;
+  } else if (q.type === 'text2') {
+    state.intakeAnswers[i] = [
+      document.getElementById('q-input-a')?.value || '',
+      document.getElementById('q-input-b')?.value || '',
+    ];
+  }
+  if (c.id === 'mind' && i === 2 && state.intakeAnswers[i] === 2) {
+    openModal('crisis'); return;
+  }
+  if (i < c.questions.length - 1) {
+    state.intakeStep++; renderIntake();
+  } else {
+    // Last question answered — go to patient-info (new user) or payment (returning)
+    if (state.auth.user) {
+      const cond = CONDITIONS[state.currentCondition];
+      const amountEl = document.getElementById('pay-amount');
+      const detailEl = document.getElementById('pay-detail');
+      if (amountEl) amountEl.textContent = '€' + cond.price;
+      if (detailEl) detailEl.textContent = fmt(tr('pay_fee_detail_fmt'), { name: L(cond.name) });
+      showView('payment');
+    } else {
+      showView('patient-info');
+    }
+  }
+}
+function prevQuestion() {
+  if (state.intakeStep === 0) { openCondition(state.currentCondition); return; }
+  state.intakeStep--; renderIntake();
+}
+
+/* ===========================================================
+   CONSENT TOGGLE
+   =========================================================== */
+function toggleConsent(input) {
+  const row = input.closest('.consent-row');
+  state.consents[row.id] = input.checked;
+  row.classList.toggle('checked', input.checked);
+}
+
+/* ===========================================================
+   AUTH — REGISTER (from patient-info screen)
+   New user: fills out form → registers → goes to payment
+   =========================================================== */
+async function goPayment() {
+  const first    = (document.getElementById('pi-first')?.value    || '').trim();
+  const last     = (document.getElementById('pi-last')?.value     || '').trim();
+  const amka     = (document.getElementById('pi-amka')?.value     || '').trim();
+  const dob      = (document.getElementById('pi-dob')?.value      || '');
+  const sex      = (document.getElementById('pi-sex')?.value      || '');
+  const email    = (document.getElementById('pi-email')?.value    || '').trim();
+  const phone    = (document.getElementById('pi-phone')?.value    || '').trim();
+  const password = (document.getElementById('pi-password')?.value || '');
+
+  // Clear previous field errors
+  ['pi-first','pi-last','pi-amka','pi-email','pi-phone','pi-dob','pi-sex'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.closest('.field')?.classList.remove('field-error');
+  });
+
+  let hasError = false;
+  function markField(id, msg) {
+    const el = document.getElementById(id);
+    if (el) {
+      const wrap = el.closest('.field');
+      if (wrap) {
+        wrap.classList.add('field-error');
+        let errEl = wrap.querySelector('.field-error-msg');
+        if (!errEl) { errEl = document.createElement('span'); errEl.className = 'field-error-msg'; wrap.appendChild(errEl); }
+        errEl.textContent = msg;
+      }
+    }
+    hasError = true;
+  }
+
+  if (!first)  markField('pi-first', tr('field_required'));
+  if (!last)   markField('pi-last',  tr('field_required'));
+  if (!email)  markField('pi-email', tr('field_required'));
+  if (!dob)    markField('pi-dob',   tr('field_required'));
+  if (!sex)    markField('pi-sex',   tr('field_required'));
+
+  if (!amka) {
+    markField('pi-amka', tr('field_required'));
+  } else if (amka.length !== 11 || !/^\d+$/.test(amka)) {
+    markField('pi-amka', tr('pi_alert_amka'));
+  }
+
+  if (phone) {
+    const cleanPhone = phone.replace(/\s/g, '');
+    if (cleanPhone.startsWith('+30')) {
+      if (cleanPhone.length < 13) markField('pi-phone', tr('pi_alert_phone_short_intl'));
+      else if (!/^\+3069\d{8}$/.test(cleanPhone)) markField('pi-phone', tr('pi_alert_phone'));
+    } else if (cleanPhone.startsWith('69')) {
+      if (cleanPhone.length < 10) markField('pi-phone', tr('pi_alert_phone_short_local'));
+      else if (!/^69\d{8}$/.test(cleanPhone)) markField('pi-phone', tr('pi_alert_phone'));
+    } else {
+      markField('pi-phone', tr('pi_alert_phone'));
+    }
+  } else {
+    markField('pi-phone', tr('field_required'));
+  }
+
+  if (!state.consents.c1 || !state.consents.c2 || !state.consents.c3) {
+    showError(tr('pi_alert_consents'));
+    hasError = true;
+  }
+
+  if (hasError) { showError(tr('pi_alert_fix_fields')); return; }
+
+  state.patient = { first, last, amka, dob, sex, email, phone };
+
+  // Already logged in — skip registration, go straight to payment
+  if (state.auth.user) {
+    if (!state.currentCondition || !CONDITIONS[state.currentCondition]) { showView('conditions'); return; }
+    const c = CONDITIONS[state.currentCondition];
+    document.getElementById('pay-amount').textContent = '€' + c.price;
+    document.getElementById('pay-detail').textContent = fmt(tr('pay_fee_detail_fmt'), { name: L(c.name) });
+    showView('payment');
+    return;
+  }
+
+  // Need password for new account
+  if (!password || password.length < 10) { showError(tr('pi_alert_password')); return; }
+
+  setLoading('pi-next', true);
+  try {
+    // Normalise phone to E.164
+    let phoneE164;
+    if (phone) {
+      phoneE164 = phone.startsWith('+') ? phone.replace(/\s/g, '') : '+30' + phone.replace(/\s/g, '');
+    }
+
+    const data = await apiFetch('POST', '/auth/register/patient', {
+      email,
+      password,
+      firstName: first,
+      lastName:  last,
+      amka,
+      dob:      dob      || undefined,
+      sex:      sex      || undefined,
+      phoneE164: phoneE164 || undefined,
+      language: state.lang === 'el' ? 'EL' : 'EN',
+      consents: {
+        telemedicine:    true,
+        healthDataGdpr:  true,
+        termsOfService:  true,
+        medicalLiability: true,
+      },
+    });
+
+    state.auth.accessToken  = data.tokens.accessToken;
+    state.auth.refreshToken = data.tokens.refreshToken;
+    state.auth.user         = data.user;
+    saveSession();
+    renderAccount();
+
+    // If no condition was selected before registering, go to home to pick one
+    if (!state.currentCondition || !CONDITIONS[state.currentCondition]) {
+      showView('conditions');
+      return;
+    }
+
+    const c = CONDITIONS[state.currentCondition];
+    document.getElementById('pay-amount').textContent = '€' + c.price;
+    document.getElementById('pay-detail').textContent = fmt(tr('pay_fee_detail_fmt'), { name: L(c.name) });
+    showView('payment');
+  } catch(e) {
+    const msg = e.message || '';
+    if (msg.toLowerCase().includes('already') || msg.toLowerCase().includes('exist') || msg.includes('409') || msg.includes('duplicate')) {
+      showError(tr('pi_alert_email_exists'));
+    } else {
+      showError(msg);
+    }
+  } finally {
+    setLoading('pi-next', false);
+  }
+}
+
+/* ===========================================================
+   AUTH — LOGIN
+   =========================================================== */
+async function doLogin() {
+  const email    = (document.getElementById('login-email')?.value    || '').trim();
+  const password = (document.getElementById('login-password')?.value || '');
+  if (!email || !password) { showError(tr('login_alert_missing')); return; }
+
+  setLoading('login-btn', true);
+  try {
+    const data = await apiFetch('POST', '/auth/login', { email, password });
+    state.auth.accessToken  = data.tokens.accessToken;
+    state.auth.refreshToken = data.tokens.refreshToken;
+    state.auth.user         = data.user;
+    saveSession();
+    renderAccount();
+
+    const ret = state._loginReturn;
+    state._loginReturn = null;
+
+    if (ret === 'patient-info-payment') {
+      // User was mid-intake on patient-info; now logged in → go to payment
+      const c = CONDITIONS[state.currentCondition];
+      if (c) {
+        document.getElementById('pay-amount').textContent = '€' + c.price;
+        document.getElementById('pay-detail').textContent = fmt(tr('pay_fee_detail_fmt'), { name: L(c.name) });
+        showView('payment');
+      } else {
+        showView('conditions');
+      }
+    } else if (ret) {
+      showView(ret);
+    } else {
+      showView('cases');
+    }
+  } catch(e) {
+    showError(e.message || tr('login_error'));
+  } finally {
+    setLoading('login-btn', false);
+  }
+}
+
+function showLoginFor(returnView) {
+  state._loginReturn = returnView;
+  // Clear previous login form
+  const le = document.getElementById('login-email');
+  const lp = document.getElementById('login-password');
+  if (le) le.value = '';
+  if (lp) lp.value = '';
+  showView('login');
+}
+
+function goBackFromLogin() {
+  showView(state._loginReturn || 'home');
+  state._loginReturn = null;
+}
+
+/* ===========================================================
+   AUTH — LOGOUT
+   =========================================================== */
+async function logout() {
+  try {
+    if (state.auth.accessToken) await apiFetch('POST', '/auth/logout');
+  } catch(e) {}
+  clearSession();
+  showView('home');
+  renderAccount();
+}
+
+/* ===========================================================
+   PAYMENT
+   =========================================================== */
+function pickPay(el) {
+  document.querySelectorAll('.pay-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+async function submitPayment() {
+  if (!state.auth.user) {
+    state._loginReturn = 'payment';
+    showView('login');
+    return;
+  }
+
+  const selected    = document.querySelector('.pay-opt.selected');
+  const providerName = selected ? selected.querySelector('.pay-name').textContent : 'Stripe';
+  const providerMap  = { 'Stripe': 'STRIPE', 'Viva Wallet': 'VIVA', 'IRIS Payments': 'IRIS' };
+  const provider     = providerMap[providerName] || 'STRIPE';
+
+  setLoading('pay-btn', true);
+  try {
+    // 1. Create the case (backend encrypts intake answers server-side)
+    const caseData = await apiFetch('POST', '/cases', {
+      condition:       COND_TO_API[state.currentCondition],
+      intakeAnswers:       state.intakeAnswers,
+      questionnaireVersion: '1',
+      language:            state.lang === 'el' ? 'EL' : 'EN',
+    });
+
+    state.pendingCaseId = caseData.id;
+
+    // 2. Upload any staged photos
+    if (state.intakePhotos && state.intakePhotos.length) {
+      for (const file of state.intakePhotos) {
+        try { await _uploadPhoto(caseData.id, file); } catch(e) { /* non-fatal */ }
+      }
+    }
+
+    // 3. Initiate payment — backend returns redirect URL
+    const baseUrl  = window.location.href.split('?')[0];
+    const payData  = await apiFetch('POST', '/payments/initiate', {
+      caseId:     caseData.id,
+      provider,
+      //successUrl: baseUrl + '?payment_success=1&cid=' + caseData.id,
+      //cancelUrl: baseUrl + '?payment_cancel=1',
+    });
+
+    // 4. Redirect to Stripe/Viva checkout
+    const redirectUrl = payData.checkoutUrl || payData.redirectUrl || payData.url;
+    if (redirectUrl) {
+      window.location.href = redirectUrl;
+    } else {
+      // Payment provider not yet configured (dev mode) — skip straight to confirm
+      showView('confirm');
+      fetchAndRenderCases();
+    }
+  } catch(e) {
+    showError(e.message);
+    setLoading('pay-btn', false);
+  }
+  // Note: don't re-enable button if we redirected away
+}
+
+/* ===========================================================
+   PHOTO UPLOAD (S3 presigned URL)
+   =========================================================== */
+async function _uploadPhoto(caseId, file) {
+  const { uploadUrl } = await apiFetch('POST', '/cases/' + caseId + '/photos/request-upload', {
+    mimeType:      file.type,
+    fileSizeBytes: file.size,
+  });
+  const putRes = await fetch(uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Type': file.type },
+    body: file,
+  });
+  if (!putRes.ok) throw new Error('S3 upload failed');
+}
+
+/* ===========================================================
+   CASES — fetch from API
+   =========================================================== */
+async function fetchAndRenderCases() {
+  if (!state.auth.user) return;
+  const list = document.getElementById('cases-list');
+  if (list) list.innerHTML = '<div class="loading-row">' + tr('loading') + '</div>';
+  try {
+    state.cases = await apiFetch('GET', '/cases/mine');
+    renderCases();
+  } catch(e) {
+    if (list) list.innerHTML = '<p class="small center" style="padding:32px;">' + tr('error_load_cases') + '</p>';
+  }
+}
+
+function renderCases() {
+  const list  = document.getElementById('cases-list');
+  const empty = document.getElementById('cases-empty');
+  if (!list) return;
+
+  if (!state.cases.length) {
+    list.innerHTML = '';
+    if (empty) empty.style.display = 'block';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+
+  const statusMap = {
+    PAYMENT_PENDING:     { cls: 'new',    key: 'badge_new' },
+    AWAITING_DOCTOR:     { cls: 'new',    key: 'badge_new' },
+    IN_REVIEW:           { cls: 'review', key: 'badge_review' },
+    AWAITING_INFO:       { cls: 'info',   key: 'badge_info' },
+    PRESCRIPTION_ISSUED: { cls: 'rx',     key: 'badge_rx' },
+    COMPLETED:           { cls: 'done',   key: 'badge_done' },
+    DECLINED:            { cls: 'done',   key: 'badge_done' },
+  };
+
+  list.innerHTML = state.cases.map(cs => {
+    const condKey = API_TO_COND[cs.condition] || 'hair';
+    const c       = CONDITIONS[condKey] || CONDITIONS.hair;
+    const badge   = statusMap[cs.status] || { cls: 'new', key: 'badge_new' };
+    const when    = formatRelativeTime(cs.submittedAt);
+    const docName = cs.doctor
+      ? (state.lang === 'el'
+          ? 'Δρ. ' + cs.doctor.firstName + ' ' + cs.doctor.lastName
+          : 'Dr. ' + cs.doctor.firstName + ' ' + cs.doctor.lastName)
+      : tr('case_doctor_assigning');
+    return `
+      <button class="case-card" onclick="openCaseDetail('${cs.id}')">
+        <div class="case-head">
+          <h3>${c.icon} ${L(c.name)}</h3>
+          <span class="badge ${badge.cls}">${tr(badge.key)}</span>
+        </div>
+        <div class="case-meta">${cs.publicId} · ${tr('case_submitted_label')} ${when} · ${docName}</div>
+      </button>
+    `;
+  }).join('');
+}
+
+function buildCaseTimeline(cs) {
+  const items = [];
+  const pay   = cs.payments && cs.payments[0];
+  const amt   = pay ? (pay.amountEurCents / 100).toFixed(0) : '—';
+  const method = pay ? pay.provider : '—';
+  const payAt  = pay ? pay.createdAt : cs.submittedAt;
+
+  items.push({
+    state: 'done',
+    title:  tr('tl_submitted'),
+    detail: fmt(tr('tl_paid_fmt'), { when: formatRelativeTime(payAt), amount: amt, method }),
+  });
+
+  const inProgress = ['PAYMENT_PENDING','AWAITING_DOCTOR','IN_REVIEW','AWAITING_INFO'].includes(cs.status);
+  if (inProgress) {
+    items.push({ state: 'active', title: tr('tl_review'), detail: tr('tl_review_queue') });
+  } else {
+    items.push({ state: 'done', title: tr('tl_review'),
+      detail: fmt(tr('tl_review_done_fmt'), { time: formatRelativeTime(cs.decisionAt) }) });
+  }
+
+  const hasRx = cs.status === 'PRESCRIPTION_ISSUED' || cs.status === 'COMPLETED';
+  if (hasRx) {
+    const rx = cs.prescriptions && cs.prescriptions[0];
+    items.push({ state: 'done', title: tr('tl_rx'),
+      detail: fmt(tr('tl_rx_done_fmt'), { id: rx?.idikaRef || '—' }) });
+  } else {
+    items.push({ state: 'pending', title: tr('tl_rx'), detail: tr('tl_rx_dash') });
+  }
+
+  if (cs.status === 'PRESCRIPTION_ISSUED') {
+    items.push({ state: 'active',   title: tr('tl_pickup'), detail: tr('tl_pickup_active') });
+    items.push({ state: 'pending',  title: tr('tl_renew'),  detail: tr('tl_renew_body') });
+  } else if (cs.status === 'COMPLETED') {
+    items.push({ state: 'done',    title: tr('tl_pickup'), detail: tr('tl_rx_dash') });
+    items.push({ state: 'pending', title: tr('tl_renew'),  detail: tr('tl_renew_body') });
+  } else {
+    items.push({ state: 'pending', title: tr('tl_pickup'), detail: tr('tl_rx_dash') });
+  }
+  return items;
+}
+
+function openCaseDetail(id) {
+  const cs = state.cases.find(x => x.id === id);
+  if (!cs) return;
+  state._lastCase = id;
+
+  const condKey = API_TO_COND[cs.condition] || 'hair';
+  const c = CONDITIONS[condKey] || CONDITIONS.hair;
+  const hasRx = cs.status === 'PRESCRIPTION_ISSUED' || cs.status === 'COMPLETED';
+  const timeline = buildCaseTimeline(cs);
+  const docName = cs.doctor
+    ? ((state.lang === 'el' ? 'Δρ.' : 'Dr.') + ' ' + cs.doctor.firstName + ' ' + cs.doctor.lastName +
+       (cs.doctor.specialty ? ', ' + cs.doctor.specialty : ''))
+    : tr('case_doctor_assigning');
+
+  const body = document.getElementById('case-detail-body');
+  body.innerHTML = `
+    <div class="page-head">
+      <p class="small" style="text-transform:uppercase;letter-spacing:0.1em;font-weight:600;color:var(--muted);">${cs.publicId}</p>
+      <h1>${c.icon} ${L(c.name)}</h1>
+      <p class="sub">${docName}</p>
+    </div>
+
+    ${hasRx && cs.prescriptions && cs.prescriptions[0] ? `
+      <div class="pharmacy-banner">
+        <div class="pb-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/>
+          </svg>
+        </div>
+        <div>
+          <h4>${tr('rx_ready_title')}</h4>
+          <p>${fmt(tr('rx_ready_sub_fmt'), { rx: cs.prescriptions[0].medicationName || tr('rx_see') })}</p>
+        </div>
+      </div>
+    ` : ''}
+
+    <div class="info-card">
+      <h3>${tr('cd_timeline')}</h3>
+      <div class="timeline" style="margin-top:12px;">
+        ${timeline.map(t => `
+          <div class="tl-item ${t.state}">
+            <div class="tl-dot"></div>
+            <h4>${t.title}</h4>
+            <p>${t.detail}</p>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h3>${tr('cd_msg_title')}</h3>
+      <p>${tr('cd_msg_body')}</p>
+      ${_renderMessages(cs)}
+      <div class="field" style="margin-top:12px;">
+        <textarea id="msg-input-${cs.id}" rows="3" placeholder="${fmt(tr('cd_msg_ph_fmt'), { doctor: docName.split(',')[0] })}"></textarea>
+      </div>
+      <button class="btn btn-secondary" onclick="sendMessage('${cs.id}')">${tr('cd_send')}</button>
+    </div>
+
+    ${hasRx ? `<button class="btn btn-primary" onclick="openModal('renewal')">${tr('cd_renew')}</button>` : ''}
+  `;
+  showView('case-detail');
+}
+
+function _renderMessages(cs) {
+  if (!cs.messages || !cs.messages.length) return '';
+  return '<div class="messages-list">' +
+    cs.messages.map(m => {
+      const sent = m.senderRole === 'PATIENT';
+      return `<div class="msg-row ${sent ? 'sent' : 'recv'}">
+        <div class="msg-bubble">${m.body}</div>
+        <div class="small" style="margin-top:2px;color:var(--muted);">${formatRelativeTime(m.createdAt)}</div>
+      </div>`;
+    }).join('') +
+  '</div>';
+}
+
+async function sendMessage(caseId) {
+  const input = document.getElementById('msg-input-' + caseId);
+  if (!input) return;
+  const body = input.value.trim();
+  if (!body) return;
+  try {
+    await apiFetch('POST', '/cases/' + caseId + '/messages', { body });
+    // Refresh case data then re-render detail
+    const updated = await apiFetch('GET', '/cases/' + caseId);
+    const idx = state.cases.findIndex(x => x.id === caseId);
+    if (idx !== -1) state.cases[idx] = updated; else state.cases.push(updated);
+    openCaseDetail(caseId);
+  } catch(e) {
+    showError(e.message);
+  }
+}
+
+/* ===========================================================
+   MODALS
+   =========================================================== */
+function openModal(kind) {
+  const body = document.getElementById('modal-body');
+  let html = '';
+  switch (kind) {
+    case 'subscription':
+      html = `
+        <h2 style="margin-bottom:14px;">${tr('mod_sub_title')}</h2>
+        <p>${tr('mod_sub_body')}</p>
+        <div class="plan-card" style="margin-top:16px;">
+          <span class="save-badge">${tr('pay_save')}</span>
+          <h3>${tr('pay_plan')}</h3>
+          <div class="plan-price">€19<small>${tr('per_month')}</small></div>
+          <div class="plan-feat">${tr('mod_sub_feat1')}</div>
+          <div class="plan-feat">${tr('mod_sub_feat2')}</div>
+          <div class="plan-feat">${tr('mod_sub_feat3')}</div>
+          <div class="plan-feat">${tr('mod_sub_feat4')}</div>
+        </div>
+        <button class="btn btn-primary" style="margin-top:12px;" onclick="closeModal()">${tr('mod_sub_cta')}</button>
+      `; break;
+    case 'language':
+      html = `
+        <h2 style="margin-bottom:14px;">${tr('mod_lang_title')}</h2>
+        <button class="opt ${state.lang==='el'?'selected':''}" style="margin-bottom:8px;" onclick="setLanguage('el');openModal('language');">
+          <span class="opt-marker"></span><span>Ελληνικά</span>
+        </button>
+        <button class="opt ${state.lang==='en'?'selected':''}" onclick="setLanguage('en');openModal('language');">
+          <span class="opt-marker"></span><span>English</span>
+        </button>
+        <p class="small center" style="margin-top:14px;">${tr('mod_lang_beta')}</p>
+      `; break;
+    case 'privacy':
+      html = `
+        <h2 style="margin-bottom:14px;">${tr('mod_priv_title')}</h2>
+        <p>${tr('mod_priv_body')}</p>
+        <hr class="divider" />
+        <h3 style="font-family:'Inter',sans-serif;font-size:1rem;margin-bottom:6px;color:var(--olive);">${tr('mod_priv_h')}</h3>
+        <p>${tr('mod_priv_p')}</p>
+        <hr class="divider" />
+        <button class="btn btn-secondary" onclick="gdprExport()">${tr('mod_priv_export')}</button>
+        <button class="btn btn-ghost" style="margin-top:8px;color:#a64a4a;" onclick="gdprDelete()">${tr('mod_priv_delete')}</button>
+      `; break;
+    case 'legal':
+      html = `
+        <h2 style="margin-bottom:14px;">${tr('mod_legal_title')}</h2>
+        <p><b style="color:var(--olive);">${tr('mod_legal_1t')}</b> — ${tr('mod_legal_1b')}</p>
+        <hr class="divider" />
+        <p><b style="color:var(--olive);">${tr('mod_legal_2t')}</b> — ${tr('mod_legal_2b')}</p>
+        <hr class="divider" />
+        <p><b style="color:var(--olive);">${tr('mod_legal_3t')}</b> — ${tr('mod_legal_3b')}</p>
+        <hr class="divider" />
+        <p><b style="color:var(--olive);">${tr('mod_legal_4t')}</b> — ${tr('mod_legal_4b')}</p>
+      `; break;
+    case 'help':
+      html = `
+        <h2 style="margin-bottom:14px;">${tr('mod_help_title')}</h2>
+        <p>${tr('mod_help_body')}</p>
+        <hr class="divider" />
+        <div class="profile-row"><div><div class="lbl">${tr('mod_help_email_l')}</div><div class="val">support@velos.gr</div></div></div>
+        <div class="profile-row"><div><div class="lbl">${tr('mod_help_phone_l')}</div><div class="val">+30 210 000 0000</div></div></div>
+        <div class="profile-row"><div><div class="lbl">${tr('mod_help_chat_l')}</div><div class="val">${tr('mod_help_chat_v')}</div></div></div>
+        <p class="small center" style="margin-top:20px;"><b>${tr('mod_help_em')}</b></p>
+      `; break;
+    case 'crisis':
+      html = `
+        <h2 style="margin-bottom:14px;color:#a64a4a;">${tr('mod_crisis_title')}</h2>
+        <p>${tr('mod_crisis_body')}</p>
+        <hr class="divider" />
+        <p style="margin-bottom:6px;"><b style="color:var(--olive);">${tr('mod_crisis_h1')}</b></p>
+        <p>${tr('mod_crisis_v1')}</p>
+        <hr class="divider" />
+        <p style="margin-bottom:6px;"><b style="color:var(--olive);">${tr('mod_crisis_h2')}</b></p>
+        <p>${tr('mod_crisis_v2')}</p>
+        <hr class="divider" />
+        <button class="btn btn-primary" onclick="closeModal();showView('home');">${tr('mod_crisis_cta')}</button>
+        <p class="small center" style="margin-top:14px;">${tr('mod_crisis_em')}</p>
+      `; break;
+    case 'renewal':
+      html = `
+        <h2 style="margin-bottom:14px;">${tr('mod_renew_title')}</h2>
+        <p>${tr('mod_renew_body')}</p>
+        <div class="info-card" style="margin:16px 0;">
+          <h3>${tr('mod_renew_h')}</h3>
+          <p>${tr('mod_renew_p')}</p>
+          <div class="field" style="margin-top:10px;"><textarea rows="3" placeholder="${tr('ta_optional')}"></textarea></div>
+        </div>
+        <button class="btn btn-primary" onclick="closeModal();alert(tr('mod_renew_alert'));">${tr('mod_renew_cta')}</button>
+        <p class="small center" style="margin-top:10px;">${tr('mod_renew_note')}</p>
+      `; break;
+    case 'personal':
+      html = `
+        <h2 style="margin-bottom:14px;">${tr('mod_personal_title')}</h2>
+        <p>${tr('mod_personal_body')}</p>
+        <div class="field-row" style="margin-top:16px;">
+          <div class="field"><label>${tr('pi_first')}</label><input type="text" id="acc-first" value="${state.patient.first || ''}" /></div>
+          <div class="field"><label>${tr('pi_last')}</label><input type="text" id="acc-last" value="${state.patient.last || ''}" /></div>
+        </div>
+        <div class="field"><label>${tr('pi_amka')}</label><input type="text" id="acc-amka-input" value="${state.patient.amka || ''}" maxlength="11" /></div>
+        <div class="field"><label>${tr('pi_email')}</label><input type="email" id="acc-email-input" value="${state.patient.email || state.auth.user?.email || ''}" /></div>
+        <div class="field"><label>${tr('pi_phone')}</label><input type="tel" id="acc-phone-input" value="${state.patient.phone || ''}" placeholder="+30 69..." /></div>
+        <button class="btn btn-primary" style="margin-top:8px;" onclick="savePersonalDetails()">${tr('save')}</button>
+      `; break;
+  }
+  body.innerHTML = html;
+  document.getElementById('modal-bg').classList.add('show');
+}
+function closeModal(ev) {
+  if (ev && ev.target.id !== 'modal-bg') return;
+  document.getElementById('modal-bg').classList.remove('show');
+}
+function openPersonalDetails() {
+  if (!state.auth.user) { showLoginFor('account'); return; }
+  openModal('personal');
+}
+function savePersonalDetails() {
+  state.patient.first = document.getElementById('acc-first')?.value || state.patient.first;
+  state.patient.last  = document.getElementById('acc-last')?.value  || state.patient.last;
+  state.patient.amka  = document.getElementById('acc-amka-input')?.value  || state.patient.amka;
+  state.patient.email = document.getElementById('acc-email-input')?.value || state.patient.email;
+  state.patient.phone = document.getElementById('acc-phone-input')?.value || state.patient.phone;
+  renderAccount();
+  document.getElementById('modal-bg').classList.remove('show');
+}
+
+/* ===========================================================
+   ACCOUNT — render from real auth state
+   =========================================================== */
+function renderAccount() {
+  const u       = state.auth.user;
+  const av      = document.getElementById('acc-avatar');
+  const nameEl  = document.getElementById('acc-name');
+  const emEl    = document.getElementById('acc-email-display');
+  const logoutBtn  = document.getElementById('acc-logout-btn');
+  const loginPrompt = document.getElementById('acc-login-prompt');
+  const profileRows = document.getElementById('acc-profile-rows');
+
+  if (u) {
+    const p = state.patient;
+    const firstName = p?.first || '';
+    const lastName  = p?.last  || '';
+    const initials  = (firstName || lastName)
+      ? ((firstName || ' ').charAt(0) + (lastName || ' ').charAt(0)).trim()
+      : u.email.charAt(0).toUpperCase();
+    const displayName = (firstName || lastName) ? (firstName + ' ' + lastName).trim() : u.email;
+
+    if (av)          av.textContent = initials;
+    if (nameEl)      nameEl.textContent = displayName;
+    if (emEl)        emEl.textContent = u.email;
+    if (logoutBtn)   logoutBtn.style.display = 'block';
+    if (loginPrompt) loginPrompt.style.display = 'none';
+    if (profileRows) profileRows.style.display = 'block';
+  } else {
+    if (av)          av.textContent = state.lang === 'el' ? 'Ι' : 'H';
+    if (nameEl)      nameEl.textContent = tr('acc_welcome');
+    if (emEl)        emEl.textContent = tr('acc_email_empty');
+    if (logoutBtn)   logoutBtn.style.display = 'none';
+    if (loginPrompt) loginPrompt.style.display = 'block';
+    if (profileRows) profileRows.style.display = 'none';
+  }
+}
+
+/* ===========================================================
+   GDPR
+   =========================================================== */
+async function gdprExport() {
+  if (!state.auth.user) { closeModal(); showLoginFor('account'); return; }
+  try {
+    const data = await apiFetch('GET', '/gdpr/export');
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url;
+    a.download = 'velos-data-export.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    document.getElementById('modal-bg').classList.remove('show');
+  } catch(e) { showError(e.message); }
+}
+
+async function gdprDelete() {
+  if (!state.auth.user) return;
+  if (!confirm(tr('gdpr_delete_confirm'))) return;
+  try {
+    await apiFetch('DELETE', '/gdpr/delete-me');
+    clearSession();
+    document.getElementById('modal-bg').classList.remove('show');
+    showView('home');
+    renderAccount();
+  } catch(e) { showError(e.message); }
+}
+
+/* ===========================================================
+   SCROLL EFFECT
+   =========================================================== */
+window.addEventListener('scroll', () => {
+  const tb = document.getElementById('topbar');
+  if (tb) {
+    if (window.scrollY > 8) tb.classList.add('scrolled');
+    else tb.classList.remove('scrolled');
+  }
+}, { passive: true });
+
+/* ===========================================================
+   INIT
+   =========================================================== */
+(function init() {
+  // Restore language preference
+  try {
+    const saved = localStorage.getItem('velos_lang');
+    if (saved && T[saved]) state.lang = saved;
+  } catch(e) {}
+
+  // Restore session from sessionStorage
+  loadSession();
+
+  // Apply language and render initial state
+  applyLanguage();
+  renderAccount();
+
+  // Handle return from payment provider (Stripe/Viva redirect)
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('payment_success')) {
+    // Clean the URL
+    window.history.replaceState({}, '', window.location.pathname);
+    state.pendingCaseId = params.get('cid') || null;
+    showView('confirm');
+    // Reload cases in the background
+    if (state.auth.user) fetchAndRenderCases();
+  } else if (params.get('payment_cancel')) {
+    window.history.replaceState({}, '', window.location.pathname);
+    // User cancelled payment — stay on home, nothing else to do
+  }
+})();
+
+</script>
+
+<div class="vl-modal-overlay" id="modal-cs1" onclick="if(event.target===this)closeModal('modal-cs1')">
+  <div class="vl-modal-box">
+    <div class="vl-modal-header">
+      <h2>Συναίνεση Τηλεϊατρικής (Ν. 3984/2011, άρ. 66)</h2>
+      <button class="vl-modal-close" onclick="closeModal('modal-cs1')" aria-label="Κλείσιμο">✕</button>
+    </div>
+    <div class="vl-modal-body"><div class="vl-note">⚠️ Προσχέδιο — υπό νομική επισκόπηση.</div><h3>Τι συναινείτε</h3><ul><li>Απομακρυσμένη αξιολόγηση από αδειούχο ιατρό ΠΙΣ.</li><li>Διαβίβαση πληροφοριών αποκλειστικά στον ιατρό της περίπτωσής σας.</li><li>Έκδοση ηλεκτρονικής συνταγής μέσω ΗΔΙΚΑ.</li></ul><h3>Τι ΔΕΝ καλύπτει</h3><ul><li>Επείγοντα — καλέστε <strong>166</strong> ή <strong>112</strong>.</li><li>Παθήσεις που απαιτούν φυσική εξέταση.</li><li>Ναρκωτικά / ελεγχόμενα φάρμακα.</li></ul><h3>Ανάκληση</h3><p>Ανά πάσα στιγμή: support@velos.gr</p></div>
+    <div class="vl-modal-footer"><button onclick="closeModal('modal-cs1')">Έκλεισε</button></div>
+  </div>
+</div>
+<div class="vl-modal-overlay" id="modal-cs2" onclick="if(event.target===this)closeModal('modal-cs2')">
+  <div class="vl-modal-box">
+    <div class="vl-modal-header">
+      <h2>Επεξεργασία Δεδομένων Υγείας (GDPR)</h2>
+      <button class="vl-modal-close" onclick="closeModal('modal-cs2')" aria-label="Κλείσιμο">✕</button>
+    </div>
+    <div class="vl-modal-body"><div class="vl-note">⚠️ Προσχέδιο — υπό νομική επισκόπηση.</div><h3>Τι συλλέγουμε</h3><ul><li>Απαντήσεις ερωτηματολογίου, φωτογραφίες, συνταγές, ΑΜΚΑ.</li></ul><h3>Με ποιους κοινοποιούμε</h3><ul><li>Μόνο στον ιατρό σας και στο ΗΔΙΚΑ.</li><li><strong>ΔΕΝ</strong> πωλούμε δεδομένα.</li></ul><h3>Αποθήκευση</h3><p>Κρυπτογραφημένοι διακομιστές ΕΕ (AWS Frankfurt).</p><h3>Δικαιώματά σας</h3><ul><li>Πρόσβαση, διόρθωση, διαγραφή, φορητότητα, ανάκληση.</li><li>Καταγγελία: ΑΠΔΠΧ (www.dpa.gr)</li></ul><p>DPO: dpo@velos.gr</p></div>
+    <div class="vl-modal-footer"><button onclick="closeModal('modal-cs2')">Έκλεισε</button></div>
+  </div>
+</div>
+<div class="vl-modal-overlay" id="modal-cs3" onclick="if(event.target===this)closeModal('modal-cs3')">
+  <div class="vl-modal-box">
+    <div class="vl-modal-header">
+      <h2>Όροι Χρήσης & Ιατρική Ευθύνη</h2>
+      <button class="vl-modal-close" onclick="closeModal('modal-cs3')" aria-label="Κλείσιμο">✕</button>
+    </div>
+    <div class="vl-modal-body"><div class="vl-note">⚠️ Προσχέδιο — υπό νομική επισκόπηση.</div><h3>Η Velos είναι πλατφόρμα — όχι ιατρός</h3><p>Δεν παρέχει ιατρικές υπηρεσίες. Δεν απασχολεί ιατρούς.</p><h3>Κλινική Ευθύνη</h3><p>Ο αδειούχος ιατρός (ΠΙΣ) φέρει <strong>πλήρη κλινική ευθύνη</strong> (Ν. 3418/2005).</p><h3>Υποχρεώσεις σας</h3><ul><li>Αληθείς πληροφορίες στο ερωτηματολόγιο.</li><li>Μη χρήση για επείγοντα — καλέστε <strong>166</strong> ή <strong>112</strong>.</li></ul><h3>Παράπονα</h3><ul><li>Ιατρική αμέλεια: Τοπικός Ιατρικός Σύλλογος.</li><li>Πλατφόρμα: support@velos.gr</li></ul></div>
+    <div class="vl-modal-footer"><button onclick="closeModal('modal-cs3')">Έκλεισε</button></div>
+  </div>
+</div>
+<script>
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.vl-modal-overlay.open').forEach(m => {
+      m.classList.remove('open'); document.body.style.overflow = '';
+    });
+  }
+});
+</script>
+</body>
+</html>
